@@ -323,7 +323,7 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div className="flex flex-col lg:grid lg:grid-cols-2 gap-12 items-center">
               {/* PIX Section */}
               <div className="flex flex-col items-center justify-center p-6 md:p-8 bg-black/40 rounded-2xl border border-white/5">
                 <h3 className="text-gold font-bold mb-6 text-xl">Doação Financeira (PIX)</h3>
