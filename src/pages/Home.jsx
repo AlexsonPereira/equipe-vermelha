@@ -325,7 +325,7 @@ export default function Home() {
 
             <div className="flex flex-col lg:grid lg:grid-cols-3 gap-8 lg:gap-12 items-start">
               {/* PIX Section */}
-              <div className="flex flex-col items-center justify-center p-6 md:p-8 bg-black/40 rounded-2xl border border-white/5">
+              <div className=" max-lg:w-full flex flex-col items-center justify-center p-6 md:p-8 bg-black/40 rounded-2xl border border-white/5">
                 <h3 className="text-gold font-bold mb-6 text-xl">Doação Financeira (PIX)</h3>
 
                 <div className="w-48 h-48 bg-white p-2 rounded-xl mb-6 shadow-inner flex items-center justify-center overflow-hidden">
