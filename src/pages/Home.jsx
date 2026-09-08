@@ -307,7 +307,7 @@ export default function Home() {
 
       {/* 4. Central de Doações */}
       <section id="doacoes" className="py-24 px-4 sm:px-6 bg-surface-dark">
-        <div className="max-w-5xl mx-auto">
+        <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
@@ -323,7 +323,7 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="flex flex-col lg:grid lg:grid-cols-2 gap-12 items-center">
+            <div className="flex flex-col lg:grid lg:grid-cols-3 gap-8 lg:gap-12 items-start">
               {/* PIX Section */}
               <div className="flex flex-col items-center justify-center p-6 md:p-8 bg-black/40 rounded-2xl border border-white/5">
                 <h3 className="text-gold font-bold mb-6 text-xl">Doação Financeira (PIX)</h3>
@@ -395,18 +395,52 @@ export default function Home() {
                   ))}
                 </div>
 
-                <div className="mt-8 p-5 bg-gold/10 rounded-xl border border-gold/20 flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left">
-                  <MapPin className="text-gold w-8 h-8 flex-shrink-0 sm:mt-1" />
-                  <div>
-                    <h4 className="text-white font-bold mb-2">Pontos de Coleta</h4>
-                    <p className="text-gray-400 text-sm leading-relaxed">
-                      Será definido em breve
-                    </p>
-                    {/* <p className="text-gray-400 text-sm leading-relaxed">
-                      Entregue sua doação física no salão da <strong>Paróquia Santo Antônio</strong> (Guanambi-BA) aos finais de semana, informando que é para a <span className="text-brand-red font-bold">Equipe Vermelha</span>.
-                    </p> */}
-                  </div>
+              </div>
+
+              {/* Cleaning Tracker Section */}
+              <div className="flex flex-col justify-center w-full">
+                <h3 className="text-gold font-bold mb-6 text-xl text-center lg:text-left">Produtos de Limpeza</h3>
+
+                <div className="space-y-6">
+                  {[
+                    { name: 'Água Sanitária', meta: 'Meta: 100L', progress: '0%' },
+                    { name: 'Sabão em Pó', meta: 'Meta: 100kg', progress: '0%' },
+                    { name: 'Detergente', meta: 'Meta: 200 un.', progress: '0%' },
+                    { name: 'Desinfetante', meta: 'Meta: 100L', progress: '0%' },
+                  ].map((item, idx) => (
+                    <div key={idx} className="w-full">
+                      <div className="flex justify-between text-sm mb-2">
+                        <span className="text-white font-bold">{item.name}</span>
+                        {/* <span className="text-gray-400 font-mono text-xs">{item.meta}</span> */}
+                      </div>
+                      <div className="h-4 w-full bg-black/60 rounded-full overflow-hidden border border-white/5 relative">
+                        <motion.div
+                          initial={{ width: 0 }}
+                          whileInView={{ width: item.progress }}
+                          viewport={{ once: true }}
+                          transition={{ duration: 1.5, delay: 0.2 + (idx * 0.2), ease: "easeOut" }}
+                          className="h-full bg-brand-red rounded-full relative"
+                        >
+                          <div className="absolute top-0 right-0 bottom-0 left-0 bg-[linear-gradient(45deg,rgba(255,255,255,.15)_25%,transparent_25%,transparent_50%,rgba(255,255,255,.15)_50%,rgba(255,255,255,.15)_75%,transparent_75%,transparent)] bg-[length:1rem_1rem] opacity-50"></div>
+                        </motion.div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
+              </div>
+
+            </div>
+
+            <div className="mt-12 p-5 bg-gold/10 rounded-xl border border-gold/20 flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left max-w-2xl mx-auto">
+              <MapPin className="text-gold w-8 h-8 flex-shrink-0 sm:mt-1" />
+              <div>
+                <h4 className="text-white font-bold mb-2">Pontos de Coleta</h4>
+                <p className="text-gray-400 text-sm leading-relaxed">
+                  Será definido em breve
+                </p>
+                {/* <p className="text-gray-400 text-sm leading-relaxed">
+                  Entregue sua doação física no salão da <strong>Paróquia Santo Antônio</strong> (Guanambi-BA) aos finais de semana, informando que é para a <span className="text-brand-red font-bold">Equipe Vermelha</span>.
+                </p> */}
               </div>
             </div>
           </motion.div>
