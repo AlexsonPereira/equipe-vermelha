@@ -305,7 +305,48 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 4. Central de Doações */}
+      {/* 4. Nossa Rifa */}
+      <section id="rifa" className="py-24 px-6 bg-gradient-to-b from-primary/10 to-surface-dark relative overflow-hidden">
+        <div className="max-w-5xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="bg-surface-dark border border-brand-red/50 p-8 md:p-12 rounded-3xl shadow-[0_0_30px_rgba(179,0,0,0.3)] relative overflow-hidden flex flex-col md:flex-row items-center gap-8 md:gap-12"
+          >
+            <div className="absolute -top-24 -right-24 w-64 h-64 bg-brand-red/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-gold/10 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div className="w-full md:w-1/2 flex justify-center relative z-10">
+              <div className="relative w-64 h-64 md:w-80 md:h-80">
+                <div className="absolute inset-0 bg-brand-red/20 rounded-full blur-2xl"></div>
+                <img
+                  src="https://www.sabornamesa.com.br/images/review-produtos/airfryer/mondial/air-fryer-grand-family-mondial-AF-55i.png"
+                  alt="Air Fryer Mondial"
+                  className="w-full h-full object-contain relative z-10 drop-shadow-[0_10px_20px_rgba(0,0,0,0.5)]"
+                />
+              </div>
+            </div>
+
+            <div className="w-full md:w-1/2 text-center md:text-left relative z-10">
+              <h3 className="text-gold font-bold tracking-widest uppercase mb-2 text-sm">Grande Sorteio</h3>
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6">Concorra a uma Air Fryer!</h2>
+
+              <p className="text-gray-300 text-base md:text-lg mb-8 leading-relaxed">
+                Participe da nossa rifa e concorra a uma incrível Air Fryer Mondial! Além de ter a chance de ganhar esse super prêmio, você ajuda a Equipe Vermelha na gincana e colabora com nossas ações solidárias. Não fique de fora dessa!
+              </p>
+
+              <Link to="/tickets" className="inline-flex items-center gap-2 bg-brand-red hover:bg-red-700 text-white font-bold py-4 px-8 rounded-full shadow-[0_0_20px_rgba(179,0,0,0.4)] transition-all hover:scale-105">
+                <Ticket className="w-5 h-5" />
+                Comprar Meu Bilhete
+              </Link>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* 5. Central de Doações */}
       <section id="doacoes" className="py-24 px-4 sm:px-6 bg-surface-dark">
         <div className="max-w-6xl mx-auto">
           <motion.div
@@ -447,7 +488,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 5. Footer */}
+      {/* 6. Footer */}
       <footer className="bg-black py-16 px-6 border-t border-white/5 text-center relative overflow-hidden">
         {/* Subtle cross watermark */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white/5 pointer-events-none">

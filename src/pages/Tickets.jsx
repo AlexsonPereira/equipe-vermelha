@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { fetchTickets, reservarTicket, adminLogin, updateTicketStatus, fetchAdminTickets } from '../services/api';
+import { fetchRifa, reservarTicket } from '../services/api';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Ticket, Lock, X, CheckCircle, Shield, Copy, Check, ExternalLink, MessageCircle } from 'lucide-react';
+import { Ticket, X, CheckCircle, Copy, Check, ExternalLink, MessageCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export default function Tickets() {
-  const [tickets, setTickets] = useState([]);
+  const [rifaData, setRifaData] = useState(null);
   const [loading, setLoading] = useState(true);
   
   // Modals and Forms
@@ -14,27 +14,16 @@ export default function Tickets() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [reservationSuccess, setReservationSuccess] = useState(null);
   const [copiedPix, setCopiedPix] = useState(false);
-  
-  // Admin state
-  const [showAdminLogin, setShowAdminLogin] = useState(false);
-  const [adminSenha, setAdminSenha] = useState('');
-  const [adminToken, setAdminToken] = useState(localStorage.getItem('adminToken') || null);
-  const [adminTickets, setAdminTickets] = useState([]);
+  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
-    loadTickets();
+    loadRifaData();
   }, []);
 
-  useEffect(() => {
-    if (adminToken) {
-      loadAdminTickets();
-    }
-  }, [adminToken]);
-
-  const loadTickets = async () => {
+  const loadRifaData = async () => {
     try {
-      const data = await fetchTickets();
-      setTickets(data);
+      const data = await fetchRifa();
+      setRifaData(data);
     } catch (error) {
       console.error(error);
     } finally {
@@ -42,22 +31,10 @@ export default function Tickets() {
     }
   };
 
-  const loadAdminTickets = async () => {
-    try {
-      const data = await fetchAdminTickets(adminToken);
-      setAdminTickets(data);
-    } catch (error) {
-      if (error.message.includes('401') || error.message.includes('403')) {
-        setAdminToken(null);
-        localStorage.removeItem('adminToken');
-      }
-      console.error(error);
-    }
-  };
-
   const handleTicketClick = (ticket) => {
     if (ticket.status === 'LIVRE') {
       setSelectedTicket(ticket);
+      setErrorMessage('');
     }
   };
 
@@ -68,6 +45,7 @@ export default function Tickets() {
   const handleReserva = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setErrorMessage('');
     try {
       const result = await reservarTicket({
         numero: selectedTicket.numero,
@@ -77,9 +55,17 @@ export default function Tickets() {
       });
       setReservationSuccess({ linkWhatsapp: result.linkWhatsapp, numero: selectedTicket.numero });
       setFormData({ nome: '', telefone: '', endereco: '' });
-      await loadTickets();
+      await loadRifaData();
     } catch (error) {
-      alert('Erro ao reservar o número. Tente novamente.');
+      if (error.status === 409) {
+        setErrorMessage(error.message);
+        setTimeout(() => {
+          setSelectedTicket(null);
+        }, 2500);
+        await loadRifaData(); // Refresh the grid
+      } else {
+        setErrorMessage('Erro ao reservar o número. Tente novamente.');
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -91,29 +77,6 @@ export default function Tickets() {
     setTimeout(() => setCopiedPix(false), 3000);
   };
 
-  const handleAdminLogin = async (e) => {
-    e.preventDefault();
-    try {
-      const token = await adminLogin(adminSenha);
-      setAdminToken(token);
-      localStorage.setItem('adminToken', token);
-      setShowAdminLogin(false);
-      setAdminSenha('');
-    } catch (error) {
-      alert('Senha incorreta.');
-    }
-  };
-
-  const handleUpdateStatus = async (numero, status) => {
-    try {
-      await updateTicketStatus(numero, status, adminToken);
-      await loadAdminTickets();
-      await loadTickets(); // update public list as well
-    } catch (error) {
-      alert('Erro ao atualizar status.');
-    }
-  };
-
   const getStatusColor = (status) => {
     switch (status) {
       case 'LIVRE': return 'bg-green-600 hover:bg-green-500 border-green-400';
@@ -121,6 +84,10 @@ export default function Tickets() {
       case 'PAGO': return 'bg-brand-red border-red-400 cursor-not-allowed opacity-80';
       default: return 'bg-gray-600 border-gray-400';
     }
+  };
+
+  const formatCurrency = (cents) => {
+    return (cents / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
   };
 
   return (
@@ -131,90 +98,53 @@ export default function Tickets() {
           <Ticket className="w-5 h-5" />
           Rifa Solidária
         </Link>
-        <button 
-          onClick={() => setShowAdminLogin(!showAdminLogin)}
-          className="text-gray-400 hover:text-white flex items-center gap-2 text-sm uppercase tracking-wider"
-        >
-          <Lock className="w-4 h-4" />
-          {adminToken ? 'Painel Admin' : 'Acesso Restrito'}
-        </button>
       </header>
 
       {/* Main Content */}
       <main className="max-w-6xl mx-auto px-4 mt-8 sm:mt-12">
-        {adminToken ? (
-          <AdminPanel 
-            tickets={adminTickets} 
-            onUpdateStatus={handleUpdateStatus} 
-            onLogout={() => { setAdminToken(null); localStorage.removeItem('adminToken'); }}
-          />
-        ) : (
-          <div className="flex flex-col items-center">
-            <h1 className="font-marker text-5xl md:text-7xl text-brand-red mb-4 text-center">Escolha seu Número</h1>
-            <p className="text-gray-300 text-center max-w-2xl mb-12">
-              Selecione um número <strong className="text-green-500">verde</strong> para reservar. Após preencher seus dados, você será redirecionado ao WhatsApp para enviar o comprovante PIX.
-            </p>
-
-            <div className="flex gap-4 mb-8 text-sm">
-              <div className="flex items-center gap-2"><div className="w-4 h-4 bg-green-600 rounded"></div> Livre</div>
-              <div className="flex items-center gap-2"><div className="w-4 h-4 bg-yellow-600 rounded"></div> Reservado</div>
-              <div className="flex items-center gap-2"><div className="w-4 h-4 bg-brand-red rounded"></div> Pago</div>
+        <div className="flex flex-col items-center">
+          <h1 className="font-marker text-5xl md:text-7xl text-brand-red mb-4 text-center">Escolha seu Número</h1>
+          {rifaData && (
+            <div className="mb-6 text-center">
+              <p className="text-xl font-bold text-white mb-1">Prêmio: <span className="text-gold">{rifaData.premio || 'Air Fryer Mondial'}</span></p>
+              <p className="text-lg text-gray-300">Valor do Bilhete: <span className="text-green-500 font-bold">{formatCurrency(rifaData.valorCentavos || 1000)}</span></p>
             </div>
+          )}
+          <p className="text-gray-300 text-center max-w-2xl mb-12">
+            Selecione um número <strong className="text-green-500">verde</strong> para reservar. Após preencher seus dados, você será redirecionado ao WhatsApp para enviar o comprovante PIX.
+          </p>
 
-            {loading ? (
-              <div className="text-gold mt-10">Carregando números...</div>
-            ) : (
-              <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-10 gap-3 w-full">
-                {tickets.map((t) => (
-                  <motion.button
-                    key={t.numero}
-                    whileHover={t.status === 'LIVRE' ? { scale: 1.05 } : {}}
-                    whileTap={t.status === 'LIVRE' ? { scale: 0.95 } : {}}
-                    onClick={() => handleTicketClick(t)}
-                    disabled={t.status !== 'LIVRE'}
-                    className={`aspect-square flex items-center justify-center rounded-lg border-2 font-bold text-white shadow-lg transition-colors ${getStatusColor(t.status)}`}
-                  >
-                    {t.numero}
-                  </motion.button>
-                ))}
-              </div>
-            )}
+          <div className="flex gap-4 mb-8 text-sm">
+            <div className="flex items-center gap-2"><div className="w-4 h-4 bg-green-600 rounded"></div> Livre</div>
+            <div className="flex items-center gap-2"><div className="w-4 h-4 bg-yellow-600 rounded"></div> Reservado</div>
+            <div className="flex items-center gap-2"><div className="w-4 h-4 bg-brand-red rounded"></div> Pago</div>
           </div>
-        )}
-      </main>
 
-      {/* Admin Login Modal */}
-      <AnimatePresence>
-        {showAdminLogin && !adminToken && (
-          <Modal onClose={() => setShowAdminLogin(false)}>
-            <div className="text-center mb-6">
-              <Shield className="w-12 h-12 text-gold mx-auto mb-4" />
-              <h2 className="text-2xl font-bold text-white">Acesso Administrativo</h2>
+          {loading ? (
+            <div className="text-gold mt-10">Carregando números...</div>
+          ) : (
+            <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-10 gap-3 w-full">
+              {rifaData?.tickets?.map((t) => (
+                <motion.button
+                  key={t.numero}
+                  whileHover={t.status === 'LIVRE' ? { scale: 1.05 } : {}}
+                  whileTap={t.status === 'LIVRE' ? { scale: 0.95 } : {}}
+                  onClick={() => handleTicketClick(t)}
+                  disabled={t.status !== 'LIVRE'}
+                  className={`aspect-square flex items-center justify-center rounded-lg border-2 font-bold text-white shadow-lg transition-colors ${getStatusColor(t.status)}`}
+                >
+                  {t.numero}
+                </motion.button>
+              ))}
             </div>
-            <form onSubmit={handleAdminLogin} className="flex flex-col gap-4">
-              <input 
-                type="password" 
-                placeholder="Senha de Acesso"
-                value={adminSenha}
-                onChange={(e) => setAdminSenha(e.target.value)}
-                className="bg-black/50 border border-white/10 rounded-lg p-3 text-white focus:border-gold outline-none"
-                required
-              />
-              <button 
-                type="submit"
-                className="bg-gold text-surface-dark font-bold rounded-lg py-3 hover:bg-yellow-500 transition-colors"
-              >
-                Entrar
-              </button>
-            </form>
-          </Modal>
-        )}
-      </AnimatePresence>
+          )}
+        </div>
+      </main>
 
       {/* Reserva Modal */}
       <AnimatePresence>
         {selectedTicket && (
-          <Modal onClose={() => { setSelectedTicket(null); setReservationSuccess(null); }}>
+          <Modal onClose={() => { setSelectedTicket(null); setReservationSuccess(null); setErrorMessage(''); }}>
             {!reservationSuccess ? (
               <>
                 <h2 className="text-2xl font-bold text-white mb-2">
@@ -222,6 +152,12 @@ export default function Tickets() {
                 </h2>
                 <p className="text-sm text-gray-400 mb-6">Preencha seus dados para garantir a reserva.</p>
                 
+                {errorMessage && (
+                  <div className="bg-red-500/20 text-red-400 border border-red-500/50 p-3 rounded-lg mb-4 text-sm font-bold">
+                    {errorMessage}
+                  </div>
+                )}
+
                 <form onSubmit={handleReserva} className="flex flex-col gap-4">
                   <div>
                     <label className="text-xs text-gold uppercase tracking-wider mb-1 block">Nome Completo *</label>
@@ -248,7 +184,7 @@ export default function Tickets() {
                   <button 
                     type="submit"
                     disabled={isSubmitting}
-                    className="mt-4 bg-brand-red text-white font-bold rounded-lg py-4 shadow-[0_0_15px_rgba(179,0,0,0.4)] hover:bg-red-700 transition-colors flex items-center justify-center gap-2"
+                    className="mt-4 bg-brand-red text-white font-bold rounded-lg py-4 shadow-[0_0_15px_rgba(179,0,0,0.4)] hover:bg-red-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
                   >
                     {isSubmitting ? 'Processando...' : (
                       <>
@@ -323,62 +259,7 @@ export default function Tickets() {
 
 // Subcomponents
 
-function AdminPanel({ tickets = [], onUpdateStatus, onLogout }) {
-  return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="w-full">
-      <div className="flex justify-between items-center mb-8">
-        <h2 className="text-3xl font-bold text-white">Painel Administrativo</h2>
-        <button onClick={onLogout} className="text-brand-red hover:text-red-400 text-sm font-bold uppercase">Sair</button>
-      </div>
-
-      <div className="bg-black/40 border border-white/5 rounded-xl overflow-hidden overflow-x-auto">
-        <table className="w-full text-left text-sm text-gray-300">
-          <thead className="bg-black/60 text-gold uppercase text-xs">
-            <tr>
-              <th className="p-4">Nº</th>
-              <th className="p-4">Status</th>
-              <th className="p-4">Comprador</th>
-              <th className="p-4">Contato</th>
-              <th className="p-4">Endereço</th>
-              <th className="p-4">Ações</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-white/5">
-            {tickets.filter(t => t.status !== 'LIVRE').length === 0 ? (
-              <tr><td colSpan="6" className="p-8 text-center text-gray-500">Nenhuma reserva encontrada.</td></tr>
-            ) : (
-              tickets.filter(t => t.status !== 'LIVRE').map((t) => (
-                <tr key={t.numero} className="hover:bg-white/[0.02]">
-                  <td className="p-4 font-bold text-white">#{t.numero}</td>
-                  <td className="p-4">
-                    <span className={`px-2 py-1 rounded text-xs font-bold ${t.status === 'PAGO' ? 'bg-brand-red/20 text-brand-red' : 'bg-yellow-600/20 text-yellow-500'}`}>
-                      {t.status}
-                    </span>
-                  </td>
-                  <td className="p-4">{t.comprador_nome}</td>
-                  <td className="p-4">{t.comprador_telefone}</td>
-                  <td className="p-4">{t.comprador_endereco || '-'}</td>
-                  <td className="p-4 flex gap-2">
-                    {t.status === 'RESERVADO' && (
-                      <button onClick={() => onUpdateStatus(t.numero, 'PAGO')} className="bg-green-600 hover:bg-green-500 text-white px-3 py-1.5 rounded text-xs font-bold">
-                        Aprovar PIX
-                      </button>
-                    )}
-                    <button onClick={() => onUpdateStatus(t.numero, 'LIVRE')} className="bg-gray-700 hover:bg-gray-600 text-white px-3 py-1.5 rounded text-xs">
-                      Cancelar
-                    </button>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
-    </motion.div>
-  );
-}
-
-function Modal({ children, onClose }) {
+export function Modal({ children, onClose }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <motion.div 
