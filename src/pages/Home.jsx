@@ -334,7 +334,7 @@ export default function Home() {
               <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6">Concorra a uma Air Fryer!</h2>
 
               <p className="text-gray-300 text-base md:text-lg mb-8 leading-relaxed">
-                Participe da nossa rifa e concorra a uma incrível Air Fryer Mondial! Além de ter a chance de ganhar esse super prêmio, você ajuda a Equipe Vermelha na gincana e colabora com nossas ações solidárias. Não fique de fora dessa!
+                Participe da nossa rifa e concorra a uma incrível Air Fryer! Além de ter a chance de ganhar esse super prêmio, você ajuda a Equipe Vermelha na gincana e colabora com nossas ações solidárias. Não fique de fora dessa!
               </p>
 
               <Link to="/tickets" className="inline-flex items-center gap-2 bg-brand-red hover:bg-red-700 text-white font-bold py-4 px-8 rounded-full shadow-[0_0_20px_rgba(179,0,0,0.4)] transition-all hover:scale-105">
