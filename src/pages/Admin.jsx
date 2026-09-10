@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { adminLogin, fetchAdminTickets, updateTicketStatus } from '../services/api';
+import { generatePDF } from '../services/pdfGenerator';
 import { motion } from 'framer-motion';
-import { Shield, ExternalLink, Copy, MessageCircle, LogOut, Check } from 'lucide-react';
+import { Shield, ExternalLink, Copy, MessageCircle, LogOut, Check, FileText, Download, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export default function Admin() {
@@ -10,6 +11,7 @@ export default function Admin() {
   const [adminTickets, setAdminTickets] = useState([]);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [sendingWhatsApp, setSendingWhatsApp] = useState(null); // numero do ticket sendo enviado
 
   useEffect(() => {
     if (adminToken) {
@@ -59,14 +61,60 @@ export default function Admin() {
     }
 
     try {
-      await updateTicketStatus(numero, newStatus, adminToken);
+      const result = await updateTicketStatus(numero, newStatus, adminToken);
       await loadAdminTickets();
+
+      // Se confirmou pagamento, gerar PDF e enviar via WhatsApp
+      if (newStatus === 'PAGO' && result?.ticket) {
+        await handleEnviarComprovante(result.ticket);
+      }
     } catch (error) {
       if (error.status === 401 || error.status === 403) {
         handleLogout();
       } else {
         alert('Erro ao atualizar status.');
       }
+    }
+  };
+
+  const handleEnviarComprovante = async (ticket) => {
+    setSendingWhatsApp(ticket.numero);
+    try {
+      const pdfFile = generatePDF(ticket);
+      const telefone = (ticket.comprador_telefone || '').replace(/\D/g, '');
+      const telefoneCompleto = telefone.startsWith('55') ? telefone : `55${telefone}`;
+      const nome = ticket.comprador_nome || 'Comprador';
+      const mensagem = `Olá ${nome}! Seu pagamento do bilhete #${ticket.numero} foi confirmado. Segue seu comprovante em PDF.`;
+
+      // Tentar usar a Web Share API (funciona em celulares)
+      if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
+        await navigator.share({
+          title: `Comprovante Rifa #${ticket.numero}`,
+          text: mensagem,
+          files: [pdfFile],
+        });
+      } else {
+        // Fallback para PC: baixar PDF + abrir WhatsApp Web
+        const url = URL.createObjectURL(pdfFile);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = pdfFile.name;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        const whatsappUrl = `https://wa.me/${telefoneCompleto}?text=${encodeURIComponent(mensagem)}`;
+        window.open(whatsappUrl, '_blank');
+      }
+    } catch (error) {
+      // Se o usuario cancelou o share, nao mostrar erro
+      if (error.name !== 'AbortError') {
+        console.error('Erro ao enviar comprovante:', error);
+        alert('Não foi possível compartilhar. O PDF foi baixado.');
+      }
+    } finally {
+      setSendingWhatsApp(null);
     }
   };
 
@@ -194,17 +242,25 @@ export default function Admin() {
                         </button>
                       )}
                       
-                      {t.status === 'PAGO' && t.comprador_codigo && (
+                      {t.status === 'PAGO' && t.comprovante_codigo && (
                         <>
-                          <Link to={`/comprovante/${t.comprador_codigo}`} target="_blank" className="bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 border border-blue-600/30 px-3 py-1.5 rounded text-xs flex items-center gap-1 transition-colors">
+                          <Link to={`/comprovante/${t.comprovante_codigo}`} target="_blank" className="bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 border border-blue-600/30 px-3 py-1.5 rounded text-xs flex items-center gap-1 transition-colors">
                             <ExternalLink className="w-3 h-3" /> Ver
                           </Link>
-                          <button onClick={() => copyToClipboard(`${window.location.origin}/comprovante/${t.comprador_codigo}`)} className="bg-white/5 hover:bg-white/10 text-gray-300 border border-white/10 px-3 py-1.5 rounded text-xs flex items-center gap-1 transition-colors">
+                          <button onClick={() => copyToClipboard(`${window.location.origin}/comprovante/${t.comprovante_codigo}`)} className="bg-white/5 hover:bg-white/10 text-gray-300 border border-white/10 px-3 py-1.5 rounded text-xs flex items-center gap-1 transition-colors">
                             <Copy className="w-3 h-3" /> Copiar Link
                           </button>
-                          <a href={`https://wa.me/${t.comprador_telefone.replace(/\D/g, '')}?text=Olá%20${encodeURIComponent(t.comprador_nome)}!%20Seu%20pagamento%20foi%20confirmado.%20Acesse%20seu%20comprovante:%20${window.location.origin}/comprovante/${t.comprador_codigo}`} target="_blank" rel="noopener noreferrer" className="bg-green-500/20 hover:bg-green-500/40 text-green-400 border border-green-500/30 px-3 py-1.5 rounded text-xs flex items-center gap-1 transition-colors">
-                            <MessageCircle className="w-3 h-3" /> WhatsApp
-                          </a>
+                          <button
+                            onClick={() => handleEnviarComprovante(t)}
+                            disabled={sendingWhatsApp === t.numero}
+                            className="bg-green-500/20 hover:bg-green-500/40 text-green-400 border border-green-500/30 px-3 py-1.5 rounded text-xs flex items-center gap-1 transition-colors disabled:opacity-50"
+                          >
+                            {sendingWhatsApp === t.numero ? (
+                              <><Loader2 className="w-3 h-3 animate-spin" /> Enviando...</>
+                            ) : (
+                              <><FileText className="w-3 h-3" /> PDF + WhatsApp</>
+                            )}
+                          </button>
                         </>
                       )}
 
