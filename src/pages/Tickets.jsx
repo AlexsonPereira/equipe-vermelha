@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom';
 export default function Tickets() {
   const [rifaData, setRifaData] = useState(null);
   const [loading, setLoading] = useState(true);
-  
+
   // Modals and Forms
   const [selectedTicket, setSelectedTicket] = useState(null);
   const [formData, setFormData] = useState({ nome: '', telefone: '', endereco: '' });
@@ -23,6 +23,8 @@ export default function Tickets() {
   const loadRifaData = async () => {
     try {
       const data = await fetchRifa();
+      console.log(data, "RIFA DATA");
+
       setRifaData(data);
     } catch (error) {
       console.error(error);
@@ -107,7 +109,7 @@ export default function Tickets() {
           {rifaData && (
             <div className="mb-6 text-center">
               <p className="text-xl font-bold text-white mb-1">Prêmio: <span className="text-gold">{rifaData.premio || 'Air Fryer Mondial'}</span></p>
-              <p className="text-lg text-gray-300">Valor do Bilhete: <span className="text-green-500 font-bold">{formatCurrency(rifaData.valorCentavos || 1000)}</span></p>
+              <p className="text-lg text-gray-300">Valor do Bilhete: <span className="text-green-500 font-bold">{formatCurrency(rifaData.valorCentavos || 500)}</span></p>
             </div>
           )}
           <p className="text-gray-300 text-center max-w-2xl mb-12">
@@ -151,7 +153,7 @@ export default function Tickets() {
                   Reservar Número <span className="text-brand-red">#{selectedTicket.numero}</span>
                 </h2>
                 <p className="text-sm text-gray-400 mb-6">Preencha seus dados para garantir a reserva.</p>
-                
+
                 {errorMessage && (
                   <div className="bg-red-500/20 text-red-400 border border-red-500/50 p-3 rounded-lg mb-4 text-sm font-bold">
                     {errorMessage}
@@ -161,27 +163,27 @@ export default function Tickets() {
                 <form onSubmit={handleReserva} className="flex flex-col gap-4">
                   <div>
                     <label className="text-xs text-gold uppercase tracking-wider mb-1 block">Nome Completo *</label>
-                    <input 
+                    <input
                       type="text" name="nome" value={formData.nome} onChange={handleFormChange} required
                       className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-white focus:border-gold outline-none"
                     />
                   </div>
                   <div>
                     <label className="text-xs text-gold uppercase tracking-wider mb-1 block">Telefone (WhatsApp) *</label>
-                    <input 
+                    <input
                       type="tel" name="telefone" value={formData.telefone} onChange={handleFormChange} required
                       className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-white focus:border-gold outline-none"
                     />
                   </div>
                   <div>
                     <label className="text-xs text-gold uppercase tracking-wider mb-1 block">Endereço</label>
-                    <input 
+                    <input
                       type="text" name="endereco" value={formData.endereco} onChange={handleFormChange}
                       className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-white focus:border-gold outline-none"
                     />
                   </div>
-                  
-                  <button 
+
+                  <button
                     type="submit"
                     disabled={isSubmitting}
                     className="mt-4 bg-brand-red text-white font-bold rounded-lg py-4 shadow-[0_0_15px_rgba(179,0,0,0.4)] hover:bg-red-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
@@ -228,7 +230,7 @@ export default function Tickets() {
                   </AnimatePresence>
                 </div>
 
-                <a 
+                <a
                   href={reservationSuccess.linkWhatsapp}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -262,14 +264,14 @@ export default function Tickets() {
 export function Modal({ children, onClose }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
         className="absolute inset-0 bg-black/80 backdrop-blur-sm"
         onClick={onClose}
       />
-      <motion.div 
-        initial={{ opacity: 0, scale: 0.9, y: 20 }} 
-        animate={{ opacity: 1, scale: 1, y: 0 }} 
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.9, y: 20 }}
         className="relative bg-surface-dark border border-white/10 p-6 sm:p-8 rounded-2xl w-full max-w-md shadow-2xl z-10"
       >

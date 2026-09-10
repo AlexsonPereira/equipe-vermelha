@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:3000/api';
+const API_URL = 'https://backend-rifa-ijgv.onrender.com/api';
 
 export const fetchRifa = async () => {
   const response = await fetch(`${API_URL}/rifa`);
