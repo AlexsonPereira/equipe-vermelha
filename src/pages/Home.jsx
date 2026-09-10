@@ -124,7 +124,7 @@ export default function Home() {
               <HeartHandshake className="w-5 h-5" />
               Doar Agora
             </a>
-            <Link target="_blank" to="https://wa.me/5577991175001?text=Quero%20comprar%20um%20numero%20da%20rifa.%20" className="bg-gold hover:bg-yellow-500 text-surface-dark font-bold py-3 sm:py-4 px-6 sm:px-8 rounded-full shadow-[0_0_20px_rgba(212,175,55,0.4)] transition-all flex items-center justify-center gap-2">
+            <Link to="/tickets" className="bg-gold hover:bg-yellow-500 text-surface-dark font-bold py-3 sm:py-4 px-6 sm:px-8 rounded-full shadow-[0_0_20px_rgba(212,175,55,0.4)] transition-all flex items-center justify-center gap-2">
               <Ticket className="w-5 h-5" />
               Comprar Rifa
             </Link>

@@ -72,7 +72,7 @@ export default function Comprovante() {
         <Link to="/" className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors">
           <ArrowLeft className="w-5 h-5" /> Voltar
         </Link>
-        <button 
+        <button
           onClick={handlePrint}
           className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg font-bold transition-colors"
         >
@@ -81,7 +81,7 @@ export default function Comprovante() {
       </div>
 
       {/* Comprovante Card */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         className="bg-white text-black w-full max-w-2xl rounded-2xl overflow-hidden shadow-2xl relative print:shadow-none print:border print:border-gray-300"
@@ -123,7 +123,7 @@ export default function Comprovante() {
             </div>
             <div className="md:col-span-2">
               <div className="text-sm text-gray-500 uppercase tracking-wider mb-1">Prêmio Concorrendo</div>
-              <div className="font-bold text-lg text-gray-800">{comprovante.premio || 'Air Fryer Mondial'}</div>
+              <div className="font-bold text-lg text-gray-800">{comprovante.premio || 'Air Fryer'}</div>
             </div>
           </div>
 
