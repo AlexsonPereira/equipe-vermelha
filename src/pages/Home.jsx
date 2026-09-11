@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Crown, HeartHandshake, Copy, Check, Church, Flame, Smartphone, Quote, Ticket, ChevronLeft, ChevronRight, Globe2, ExternalLink, Search, MessageCircle, Package, ShieldCheck, Utensils, Sparkles, ShoppingBasket } from 'lucide-react';
+import { Crown, HeartHandshake, Copy, Check, Church, Flame, Smartphone, Quote, Ticket, ChevronLeft, ChevronRight, Globe2, ExternalLink, Search, MessageCircle, Package, ShieldCheck, Utensils, Sparkles, ShoppingBasket, MapPin, Clock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import img1 from '../assets/images.jpg';
 import img2 from '../assets/images (1).jpg';
@@ -557,6 +557,45 @@ export default function Home() {
               Falar no WhatsApp
             </a>
           </div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className='grid overflow-hidden rounded-3xl border border-white/10 bg-white/[0.035] lg:grid-cols-[minmax(0,1.6fr)_minmax(300px,0.7fr)] mt-12 lg:mt-16'
+          >
+            <iframe
+              src='https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3867.4365001332685!2d-42.781689!3d-14.2277404!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x75ac59cee209b33%3A0x412da737d2058d2d!2sSecret%C3%A1ria%20Paroquial%20de%20Sto%C2%B0%20Ant%C3%B4nio!5e0!3m2!1spt-BR!2sbr!4v1789148941232!5m2!1spt-BR!2sbr'
+              width='600'
+              height='450'
+              style={{ border: 0 }}
+              allowFullScreen
+              loading='lazy'
+              referrerPolicy='strict-origin-when-cross-origin'
+              title='Mapa da Secretária Paroquial de Santo Antônio'
+              className='block h-[360px] w-full md:h-[450px] lg:h-full lg:min-h-[450px]'
+            />
+
+            <div className='flex flex-col justify-center p-7 md:p-10'>
+              <div className='mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-gold/10 text-gold'>
+                <MapPin className='h-7 w-7' />
+              </div>
+              <p className='mb-2 text-sm font-bold uppercase tracking-[0.2em] text-gold'>Local de entrega</p>
+              <h3 className='mb-7 text-2xl font-bold leading-tight text-white md:text-3xl'>
+                Secretária Paroquial de Sto° Antônio
+              </h3>
+
+              <div className='rounded-2xl border border-gold/25 bg-gold/10 p-5'>
+                <div className='mb-3 flex items-center gap-3 text-gold'>
+                  <Clock className='h-5 w-5 shrink-0' />
+                  <p className='text-sm font-bold uppercase tracking-wider'>Horário de funcionamento</p>
+                </div>
+                <p className='text-lg font-bold text-white'>Segunda a sexta-feira</p>
+                <p className='text-lg text-gray-300'>das 8h às 17h.</p>
+              </div>
+            </div>
+          </motion.div>
 
           <p className="text-center text-gray-400 mt-7">
             Contato para doações: <a href="https://wa.me/5577998233676?text=Ol%C3%A1%21%20Quero%20ajudar%20a%20Equipe%20Vermelha%20com%20uma%20doa%C3%A7%C3%A3o.%20Como%20posso%20entregar%3F" className="text-white font-bold hover:text-gold transition-colors">(77) 99823-3676</a>
