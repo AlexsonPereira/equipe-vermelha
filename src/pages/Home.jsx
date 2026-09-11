@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Crown, HeartHandshake, Copy, Check, Church, Flame, Smartphone, Quote, Ticket, ChevronLeft, ChevronRight, Globe2, ExternalLink, Search, MessageCircle, Package, ShieldCheck, Utensils, Sparkles } from 'lucide-react';
+import { Crown, HeartHandshake, Copy, Check, Church, Flame, Smartphone, Quote, Ticket, ChevronLeft, ChevronRight, Globe2, ExternalLink, Search, MessageCircle, Package, ShieldCheck, Utensils, Sparkles, ShoppingBasket } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import img1 from '../assets/images.jpg';
 import img2 from '../assets/images (1).jpg';
@@ -485,8 +485,14 @@ export default function Home() {
               <p className="text-gray-400 text-base md:text-lg">Escolha uma categoria e fale conosco para combinar a entrega.</p>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-6">
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
               {[
+                {
+                  icon: <ShoppingBasket className="w-7 h-7" />,
+                  title: 'Alimentos não perecíveis',
+                  highlight: '3 pontos por unidade',
+                  items: ['Arroz e feijão', 'Macarrão e farinha', 'Óleo de cozinha', 'Açúcar, sal e café']
+                },
                 {
                   icon: <Sparkles className="w-7 h-7" />,
                   title: 'Limpeza',
