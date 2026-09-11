@@ -4,6 +4,24 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Ticket, X, CheckCircle, Copy, Check, ExternalLink, MessageCircle, QrCode, Send, DollarSign, ArrowRight, Clock, PartyPopper } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
+const formatPhone = (value) => {
+  const digits = value.replace(/\D/g, '').slice(0, 11);
+
+  if (digits.length <= 2) {
+    return digits ? `(${digits}` : '';
+  }
+
+  const areaCode = digits.slice(0, 2);
+  const number = digits.slice(2);
+
+  if (number.length <= 4) {
+    return `(${areaCode}) ${number}`;
+  }
+
+  const prefixLength = number.length <= 8 ? 4 : 5;
+  return `(${areaCode}) ${number.slice(0, prefixLength)}-${number.slice(prefixLength)}`;
+};
+
 export default function Tickets() {
   const [rifaData, setRifaData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -43,7 +61,11 @@ export default function Tickets() {
   };
 
   const handleFormChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: name === 'telefone' ? formatPhone(value) : value,
+    });
   };
 
   const handleReserva = async (e) => {
@@ -94,6 +116,10 @@ export default function Tickets() {
     return (cents / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
   };
 
+  const totalTickets = rifaData?.tickets?.length ?? 0;
+  const ticketsVendidos = rifaData?.tickets?.filter(({ status }) => status === 'PAGO').length ?? 0;
+  const percentualVendido = totalTickets > 0 ? (ticketsVendidos / totalTickets) * 100 : 0;
+
   return (
     <div className="min-h-screen bg-surface-dark text-text-light font-sans selection:bg-brand-red selection:text-white pb-20">
       {/* Header */}
@@ -117,6 +143,38 @@ export default function Tickets() {
           <p className="text-gray-300 text-center max-w-2xl mb-12">
             Selecione um número <strong className="text-green-500">verde</strong> para reservar. Após preencher seus dados, você será redirecionado ao WhatsApp para enviar o comprovante PIX.
           </p>
+
+          {rifaData && (
+            <section className="w-full max-w-2xl mb-8 hidden" aria-labelledby="progresso-rifa">
+              <div className="flex items-end justify-between gap-4 mb-2">
+                <div>
+                  <h2 id="progresso-rifa" className="text-sm font-bold uppercase tracking-wider text-gold">
+                    Progresso da rifa
+                  </h2>
+                  <p className="text-sm text-gray-400">
+                    <span className="font-bold text-white">{ticketsVendidos}</span> de {totalTickets} bilhetes vendidos
+                  </p>
+                </div>
+                <span className="text-xl font-bold text-white">{Math.round(percentualVendido)}%</span>
+              </div>
+
+              <div
+                className="h-4 w-full overflow-hidden rounded-full border border-white/10 bg-black/50"
+                role="progressbar"
+                aria-label={`${ticketsVendidos} de ${totalTickets} bilhetes vendidos`}
+                aria-valuemin={0}
+                aria-valuemax={totalTickets}
+                aria-valuenow={ticketsVendidos}
+              >
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: `${percentualVendido}%` }}
+                  transition={{ duration: 0.8, ease: 'easeOut' }}
+                  className="h-full rounded-full bg-gradient-to-r from-brand-red to-gold"
+                />
+              </div>
+            </section>
+          )}
 
           <div className="flex gap-4 mb-8 text-sm">
             <div className="flex items-center gap-2"><div className="w-4 h-4 bg-green-600 rounded"></div> Livre</div>
