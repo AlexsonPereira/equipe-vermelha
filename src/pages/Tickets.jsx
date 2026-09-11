@@ -110,7 +110,7 @@ export default function Tickets() {
           <h1 className="font-marker text-5xl md:text-7xl text-brand-red mb-4 text-center">Escolha seu Número</h1>
           {rifaData && (
             <div className="mb-6 text-center">
-              <p className="text-xl font-bold text-white mb-1">Prêmio: <span className="text-gold">{rifaData.premio || 'Air Fryer Mondial'}</span></p>
+              <p className="text-xl font-bold text-white mb-1">Prêmio: <span className="text-gold">{'Air Fryer'}</span></p>
               <p className="text-lg text-gray-300">Valor do Bilhete: <span className="text-green-500 font-bold">{formatCurrency(rifaData.valorCentavos || 500)}</span></p>
             </div>
           )}
@@ -318,8 +318,8 @@ export default function Tickets() {
                   <button
                     onClick={handleCopyPix}
                     className={`w-full border py-3 px-4 rounded-xl flex items-center justify-between transition-all duration-300 group ${copiedPix
-                        ? 'bg-green-500/10 border-green-500/50 shadow-[0_0_15px_rgba(34,197,94,0.15)]'
-                        : 'bg-black/50 border-gold/30 hover:bg-gold/10 hover:border-gold'
+                      ? 'bg-green-500/10 border-green-500/50 shadow-[0_0_15px_rgba(34,197,94,0.15)]'
+                      : 'bg-black/50 border-gold/30 hover:bg-gold/10 hover:border-gold'
                       }`}
                   >
                     <span className="truncate mr-4 text-xs text-gray-300 font-mono">00020126360014br.gov...</span>
