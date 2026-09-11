@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { fetchRifa, reservarTicket } from '../services/api';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Ticket, X, CheckCircle, Copy, Check, ExternalLink, MessageCircle } from 'lucide-react';
+import { Ticket, X, CheckCircle, Copy, Check, ExternalLink, MessageCircle, QrCode, Send, DollarSign, ArrowRight, Clock, PartyPopper } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export default function Tickets() {
@@ -15,6 +15,8 @@ export default function Tickets() {
   const [reservationSuccess, setReservationSuccess] = useState(null);
   const [copiedPix, setCopiedPix] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [whatsappClicked, setWhatsappClicked] = useState(false);
+  const [finalStep, setFinalStep] = useState(false);
 
   useEffect(() => {
     loadRifaData();
@@ -146,7 +148,7 @@ export default function Tickets() {
       {/* Reserva Modal */}
       <AnimatePresence>
         {selectedTicket && (
-          <Modal onClose={() => { setSelectedTicket(null); setReservationSuccess(null); setErrorMessage(''); }}>
+          <Modal onClose={() => { setSelectedTicket(null); setReservationSuccess(null); setErrorMessage(''); setWhatsappClicked(false); setFinalStep(false); }}>
             {!reservationSuccess ? (
               <>
                 <h2 className="text-2xl font-bold text-white mb-2">
@@ -198,23 +200,141 @@ export default function Tickets() {
               </>
             ) : (
               <div className="flex flex-col items-center text-center">
-                <CheckCircle className="w-12 h-12 text-green-500 mb-4" />
-                <h2 className="text-2xl font-bold text-white mb-2">Reserva Confirmada!</h2>
-                <p className="text-sm text-gray-400 mb-6">
-                  Seu número <span className="text-brand-red font-bold">#{reservationSuccess.numero}</span> foi reservado. Realize o pagamento via PIX e envie o comprovante.
-                </p>
+                {/* Animated Check Icon */}
+                <motion.div
+                  initial={{ scale: 0, rotate: -180 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  transition={{ type: 'spring', stiffness: 200, damping: 15, delay: 0.1 }}
+                  className="relative mb-5"
+                >
+                  <div className="w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center">
+                    <CheckCircle className="w-10 h-10 text-green-500" />
+                  </div>
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: [0, 1.5, 0] }}
+                    transition={{ duration: 0.8, delay: 0.3 }}
+                    className="absolute inset-0 rounded-full border-2 border-green-500/40"
+                  />
+                </motion.div>
 
-                <div className="bg-white p-2 rounded-xl mb-4 w-48 h-48 mx-auto flex items-center justify-center overflow-hidden">
-                  <img src="/qrcode.PNG" alt="QR Code PIX" className="w-full h-full object-contain" />
-                </div>
+                <motion.h2
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                  className="text-2xl font-bold text-white mb-1"
+                >
+                  Reserva Confirmada!
+                </motion.h2>
+                <motion.p
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="text-sm text-gray-400 mb-5"
+                >
+                  Número <span className="text-brand-red font-bold">#{reservationSuccess.numero}</span> reservado com sucesso.
+                </motion.p>
 
-                <div className="w-full mb-6 relative">
+                {/* Stepper Progress */}
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 }}
+                  className="flex items-center justify-center gap-2 mb-6 w-full"
+                >
+                  <div className="flex flex-col items-center">
+                    <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center text-white text-xs font-bold">
+                      <Check className="w-4 h-4" />
+                    </div>
+                    <span className="text-[10px] text-green-500 mt-1 font-medium">Reserva</span>
+                  </div>
+                  <div className="h-[2px] w-8 bg-gradient-to-r from-green-500 to-gold rounded-full" />
+                  <div className="flex flex-col items-center">
+                    <motion.div
+                      animate={{ boxShadow: ['0 0 0px rgba(212,175,55,0)', '0 0 12px rgba(212,175,55,0.6)', '0 0 0px rgba(212,175,55,0)'] }}
+                      transition={{ repeat: Infinity, duration: 2 }}
+                      className="w-8 h-8 rounded-full bg-gold flex items-center justify-center text-black text-xs font-bold"
+                    >
+                      2
+                    </motion.div>
+                    <span className="text-[10px] text-gold mt-1 font-medium">PIX</span>
+                  </div>
+                  <div className="h-[2px] w-8 bg-white/10 rounded-full" />
+                  <div className="flex flex-col items-center">
+                    <div className="w-8 h-8 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-gray-500 text-xs font-bold">
+                      3
+                    </div>
+                    <span className="text-[10px] text-gray-500 mt-1 font-medium">Enviar</span>
+                  </div>
+                </motion.div>
+
+                {/* Payment Value Badge */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.5, type: 'spring', stiffness: 300 }}
+                  className="w-full bg-gradient-to-r from-gold/10 via-gold/5 to-gold/10 border border-gold/30 rounded-xl p-3 mb-5 flex items-center justify-between"
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-full bg-gold/20 flex items-center justify-center">
+                      <DollarSign className="w-4 h-4 text-gold" />
+                    </div>
+                    <span className="text-sm text-gray-300">Valor do pagamento</span>
+                  </div>
+                  <span className="text-xl font-bold text-gold">R$ 5,00</span>
+                </motion.div>
+
+                {/* QR Code */}
+                {!finalStep && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.6 }}
+                    className="relative mb-4"
+                  >
+                    <div className="bg-white p-2 rounded-xl w-44 h-44 mx-auto flex items-center justify-center overflow-hidden shadow-lg shadow-black/30">
+                      <img src="/qrcode.PNG" alt="QR Code PIX" className="w-full h-full object-contain" />
+                    </div>
+                    <motion.div
+                      initial={{ opacity: 0, y: 5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.8 }}
+                      className="flex items-center justify-center gap-1 mt-2"
+                    >
+                      <QrCode className="w-3 h-3 text-gray-500" />
+                      <span className="text-[10px] text-gray-500 uppercase tracking-wider">Escaneie ou copie a chave abaixo</span>
+                    </motion.div>
+                  </motion.div>
+                )}
+
+                {/* Copy PIX Button */}
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.7 }}
+                  className="w-full mb-5 relative"
+                >
+                  <span className="text-[10px] text-gold uppercase tracking-wider font-medium mb-1.5 block text-left">Chave PIX Copia e Cola</span>
                   <button
                     onClick={handleCopyPix}
-                    className="w-full bg-black/50 border border-gold/50 text-white font-mono py-3 px-4 rounded-xl flex items-center justify-between hover:bg-gold/10 hover:border-gold transition-all group"
+                    className={`w-full border py-3 px-4 rounded-xl flex items-center justify-between transition-all duration-300 group ${
+                      copiedPix
+                        ? 'bg-green-500/10 border-green-500/50 shadow-[0_0_15px_rgba(34,197,94,0.15)]'
+                        : 'bg-black/50 border-gold/30 hover:bg-gold/10 hover:border-gold'
+                    }`}
                   >
-                    <span className="truncate mr-4 text-xs text-gray-300">00020126360014br.gov...</span>
-                    {copiedPix ? <Check className="text-green-500 w-5 h-5 flex-shrink-0" /> : <Copy className="text-gold w-5 h-5 flex-shrink-0" />}
+                    <span className="truncate mr-4 text-xs text-gray-300 font-mono">00020126360014br.gov...</span>
+                    <div className={`flex items-center gap-1.5 text-xs font-medium flex-shrink-0 ${copiedPix ? 'text-green-500' : 'text-gold'}`}>
+                      {copiedPix ? (
+                        <>
+                          <Check className="w-4 h-4" /> Copiado!
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-4 h-4" /> Copiar
+                        </>
+                      )}
+                    </div>
                   </button>
                   <AnimatePresence>
                     {copiedPix && (
@@ -224,21 +344,128 @@ export default function Tickets() {
                         exit={{ opacity: 0, scale: 0.8 }}
                         className="absolute top-0 right-0 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg flex items-center gap-1"
                       >
-                        <Check className="w-3 h-3" /> Copiado!
+                        <Check className="w-3 h-3" /> Chave Copiada!
                       </motion.div>
                     )}
                   </AnimatePresence>
-                </div>
+                </motion.div>
 
-                <a
-                  href={reservationSuccess.linkWhatsapp}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => { setSelectedTicket(null); setReservationSuccess(null); }}
-                  className="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-4 rounded-lg flex items-center justify-center gap-2 transition-colors shadow-lg shadow-green-900/20"
-                >
-                  Enviar Comprovante <ExternalLink className="w-5 h-5" />
-                </a>
+                {/* WhatsApp Send Button */}
+                {!finalStep && (
+                  <>
+                    <motion.a
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.8 }}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      href={reservationSuccess.linkWhatsapp}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => setWhatsappClicked(true)}
+                      className="w-full bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-400 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-3 transition-all shadow-lg shadow-green-900/30 relative overflow-hidden group"
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+                      <MessageCircle className="w-5 h-5" />
+                      <span>Enviar Comprovante via WhatsApp</span>
+                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </motion.a>
+
+                    <AnimatePresence>
+                      {whatsappClicked && (
+                        <motion.button
+                          initial={{ opacity: 0, y: 10, height: 0 }}
+                          animate={{ opacity: 1, y: 0, height: 'auto' }}
+                          exit={{ opacity: 0, y: -10 }}
+                          transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+                          onClick={() => setFinalStep(true)}
+                          className="w-full mt-3 border-2 border-dashed border-gold/40 hover:border-gold hover:bg-gold/5 text-gold font-semibold py-3 rounded-xl flex items-center justify-center gap-2 transition-all"
+                        >
+                          <Check className="w-4 h-4" />
+                          Já enviei o comprovante
+                          <ArrowRight className="w-4 h-4" />
+                        </motion.button>
+                      )}
+                    </AnimatePresence>
+
+                    <motion.p
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 1 }}
+                      className="text-[10px] text-gray-600 mt-3"
+                    >
+                      Após o pagamento, envie o comprovante para confirmação.
+                    </motion.p>
+                  </>
+                )}
+
+                {/* Final Step - Confirmation */}
+                <AnimatePresence>
+                  {finalStep && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+                      className="w-full flex flex-col items-center"
+                    >
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ type: 'spring', stiffness: 300, damping: 15, delay: 0.2 }}
+                        className="w-16 h-16 rounded-full bg-gold/20 flex items-center justify-center mb-4"
+                      >
+                        <Clock className="w-8 h-8 text-gold" />
+                      </motion.div>
+
+                      <motion.p
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.3 }}
+                        className="text-lg font-bold text-white mb-2"
+                      >
+                        Comprovante enviado!
+                      </motion.p>
+
+                      <motion.p
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.4 }}
+                        className="text-sm text-gray-400 mb-6 leading-relaxed"
+                      >
+                        Em instantes sua reserva será confirmada. ✨
+                        <br />
+                        <span className="text-gold font-medium">Fique tranquilo, você será notificado!</span>
+                      </motion.p>
+
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.5 }}
+                        className="w-full bg-green-500/10 border border-green-500/30 rounded-xl p-4 mb-5 flex items-center gap-3"
+                      >
+                        <div className="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center flex-shrink-0">
+                          <CheckCircle className="w-5 h-5 text-green-500" />
+                        </div>
+                        <div className="text-left">
+                          <p className="text-sm font-bold text-green-500">Número #{reservationSuccess.numero}</p>
+                          <p className="text-xs text-gray-400">Pagamento de <span className="text-gold font-semibold">R$ 5,00</span> em análise</p>
+                        </div>
+                      </motion.div>
+
+                      <motion.button
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.6 }}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => { setSelectedTicket(null); setReservationSuccess(null); setWhatsappClicked(false); setFinalStep(false); }}
+                        className="w-full bg-white/10 hover:bg-white/15 border border-white/10 text-white font-semibold py-3 rounded-xl flex items-center justify-center gap-2 transition-all"
+                      >
+                        Voltar para os números
+                      </motion.button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             )}
           </Modal>
@@ -273,7 +500,7 @@ export function Modal({ children, onClose }) {
         initial={{ opacity: 0, scale: 0.9, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.9, y: 20 }}
-        className="relative bg-surface-dark border border-white/10 p-6 sm:p-8 rounded-2xl w-full max-w-md shadow-2xl z-10"
+        className="relative bg-surface-dark border border-white/10 p-6 sm:p-8 rounded-2xl w-full max-w-md shadow-2xl z-10 max-h-[85vh] overflow-y-auto"
       >
         <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-white">
           <X className="w-6 h-6" />
