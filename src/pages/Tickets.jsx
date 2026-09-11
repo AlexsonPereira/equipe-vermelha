@@ -317,11 +317,10 @@ export default function Tickets() {
                   <span className="text-[10px] text-gold uppercase tracking-wider font-medium mb-1.5 block text-left">Chave PIX Copia e Cola</span>
                   <button
                     onClick={handleCopyPix}
-                    className={`w-full border py-3 px-4 rounded-xl flex items-center justify-between transition-all duration-300 group ${
-                      copiedPix
+                    className={`w-full border py-3 px-4 rounded-xl flex items-center justify-between transition-all duration-300 group ${copiedPix
                         ? 'bg-green-500/10 border-green-500/50 shadow-[0_0_15px_rgba(34,197,94,0.15)]'
                         : 'bg-black/50 border-gold/30 hover:bg-gold/10 hover:border-gold'
-                    }`}
+                      }`}
                   >
                     <span className="truncate mr-4 text-xs text-gray-300 font-mono">00020126360014br.gov...</span>
                     <div className={`flex items-center gap-1.5 text-xs font-medium flex-shrink-0 ${copiedPix ? 'text-green-500' : 'text-gold'}`}>
@@ -474,7 +473,7 @@ export default function Tickets() {
 
       {/* WhatsApp Floating Button */}
       <a
-        href="https://wa.me/5577998233676?text=Ol%C3%A1%2C%20preciso%20de%20ajuda%20com%20a%20rifa!"
+        href="https://wa.me/5577991175001?text=Ol%C3%A1%2C%20preciso%20de%20ajuda%20com%20a%20rifa!"
         target="_blank"
         rel="noopener noreferrer"
         className="fixed bottom-6 right-6 z-50 flex items-center gap-3 bg-green-500 hover:bg-green-400 text-white px-4 py-3 rounded-full shadow-lg shadow-green-900/30 transition-all hover:scale-105"

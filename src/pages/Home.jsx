@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Crown, HeartHandshake, Copy, Check, Church, Flame, Smartphone, Quote, MapPin, Ticket, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Crown, HeartHandshake, Copy, Check, Church, Flame, Smartphone, Quote, Ticket, ChevronLeft, ChevronRight, Globe2, ExternalLink, Search, MessageCircle, Package, ShieldCheck, Utensils, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import img1 from '../assets/images.jpg';
 import img2 from '../assets/images (1).jpg';
@@ -36,6 +36,29 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-surface-dark text-text-light font-sans selection:bg-brand-red selection:text-white">
+
+
+      {/* Botão flutuante de doação */}
+      <motion.div
+        initial={{ opacity: 0, x: 40 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.6, delay: 1 }}
+        className="fixed right-3 bottom-5 md:right-0 md:bottom-auto md:top-1/2 md:-translate-y-1/2 z-50"
+      >
+        <a
+          href="#doacoes"
+          aria-label="Fazer uma doação"
+          className="group flex items-center gap-3 bg-brand-red hover:bg-red-700 text-white font-bold py-3 px-5 md:py-5 md:px-3 rounded-full md:rounded-l-2xl md:rounded-r-none shadow-[0_8px_30px_rgba(179,0,0,0.55)] border border-white/20 md:border-r-0 transition-all hover:pr-6 md:hover:pr-4"
+        >
+          <span className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/15">
+            <span className="absolute inset-0 rounded-full bg-white/20 animate-ping"></span>
+            <HeartHandshake className="relative w-5 h-5" />
+          </span>
+          <span className="leading-tight md:[writing-mode:vertical-rl] md:rotate-180">
+            Doe agora
+          </span>
+        </a>
+      </motion.div>
 
       {/* 1. Hero Section */}
       <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden pt-20 pb-16 px-4">
@@ -223,6 +246,7 @@ export default function Home() {
         </div>
       </section>
 
+
       {/* 3b. História e Milagre no Brasil */}
       <section className="py-24 px-6 bg-gradient-to-t from-surface-dark to-primary/10 relative overflow-hidden">
         <div className="max-w-6xl mx-auto flex flex-col lg:flex-row gap-16 items-center">
@@ -305,6 +329,39 @@ export default function Home() {
         </div>
       </section>
 
+
+      {/* 3c. O site dos Milagres Eucarísticos */}
+      <section className="py-24 px-6 bg-gradient-to-b from-surface-dark via-primary/10 to-surface-dark relative overflow-hidden">
+        <div className="absolute -top-24 -left-24 w-72 h-72 bg-gold/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div className="absolute -bottom-32 -right-20 w-80 h-80 bg-brand-red/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div className="max-w-6xl mx-auto relative z-10">
+          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-80px" }} transition={{ duration: 0.8 }} className="grid lg:grid-cols-[0.9fr_1.1fr] gap-10 lg:gap-16 items-center">
+            <div className="bg-surface-dark border border-gold/30 rounded-3xl p-8 md:p-10 shadow-[0_0_35px_rgba(212,175,55,0.12)]">
+              <div className="w-16 h-16 rounded-2xl bg-gold/10 text-gold flex items-center justify-center mb-8"><Globe2 className="w-9 h-9" /></div>
+              <p className="font-cursive text-2xl md:text-3xl text-white leading-relaxed mb-8">“A internet também pode ser uma estrada que conduz as pessoas ao encontro com Jesus.”</p>
+              <div className="grid grid-cols-2 gap-4 border-t border-white/10 pt-8">
+                <div><strong className="block text-3xl md:text-4xl text-gold mb-1">136</strong><span className="text-sm text-gray-400">milagres apresentados</span></div>
+                <div><strong className="block text-3xl md:text-4xl text-gold mb-1">5</strong><span className="text-sm text-gray-400">continentes alcançados</span></div>
+              </div>
+            </div>
+            <div>
+              <h3 className="text-gold font-bold tracking-widest uppercase mb-2 text-sm flex items-center gap-2"><Search className="w-5 h-5" />Fé, pesquisa e tecnologia</h3>
+              <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">O site que Carlo criou para evangelizar</h2>
+              <div className="space-y-5 text-gray-300 text-base md:text-lg leading-relaxed">
+                <p>Carlo Acutis se perguntava por que tantas pessoas faziam longas filas para shows e outros eventos, mas não demonstravam o mesmo entusiasmo para encontrar Jesus na Eucaristia. Para ele, isso acontecia porque muitos ainda não conheciam a grandeza desse sacramento.</p>
+                <p>Movido por esse desejo de despertar a fé, Carlo começou a pesquisar os milagres eucarísticos reconhecidos pela Igreja. Durante cerca de dois anos e meio, com a ajuda de sua família, reuniu fotografias, documentos e relatos históricos e transformou esse conteúdo em uma exposição acessível também pela internet.</p>
+                <p>O propósito era simples e profundo: usar a tecnologia como instrumento de evangelização, mostrar que a presença de Cristo na Eucaristia é uma realidade viva e ajudar outras pessoas a se aproximarem de Deus. O projeto apresenta aproximadamente 136 milagres em 166 painéis e permite visitar virtualmente lugares de diversos países.</p>
+              </div>
+              <a href="https://www.miracolieucaristici.org/pr/Liste/list.html" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 mt-8 bg-gold hover:bg-yellow-500 text-surface-dark font-bold py-4 px-7 rounded-full transition-all hover:scale-105 shadow-[0_0_20px_rgba(212,175,55,0.25)]">
+                Conhecer os Milagres Eucarísticos <ExternalLink className="w-5 h-5" />
+              </a>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+
+
       {/* 4. Nossa Rifa */}
       <section id="rifa" className="py-24 px-6 bg-gradient-to-b from-primary/10 to-surface-dark relative overflow-hidden">
         <div className="max-w-5xl mx-auto">
@@ -347,144 +404,157 @@ export default function Home() {
       </section>
 
       {/* 5. Central de Doações */}
-      <section id="doacoes" className="py-24 px-4 sm:px-6 bg-surface-dark">
-        <div className="max-w-6xl mx-auto">
+      <section id="doacoes" className="py-28 md:py-36 px-4 sm:px-6 bg-surface-dark relative overflow-hidden">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[500px] bg-brand-red/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div className="max-w-6xl mx-auto relative z-10">
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="text-center max-w-4xl mx-auto mb-16 md:mb-20"
+          >
+            <span className="inline-flex items-center gap-2 bg-brand-red/15 border border-brand-red/40 text-red-300 font-bold uppercase tracking-[0.2em] text-xs px-5 py-2.5 rounded-full mb-7">
+              <HeartHandshake className="w-4 h-4" />
+              Sua ajuda é urgente
+            </span>
+            <h2 className="font-marker text-4xl sm:text-5xl md:text-7xl text-brand-red mb-7">Faça parte desta missão</h2>
+            <p className="text-gray-200 text-lg md:text-2xl leading-relaxed">
+              Cada contribuição ajuda a <strong className="text-white">Equipe Vermelha</strong> e se transforma em cuidado concreto. Doe pelo PIX ou contribua com produtos e utensílios.
+              O valor pode parecer pequeno para você, mas, somado ao de outras pessoas, faz uma diferença enorme.
+            </p>
+          </motion.div>
+
+          {/* PIX em destaque */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.97 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            className="bg-gradient-to-br from-[#3a0000] to-surface-dark border border-brand-red/50 rounded-3xl p-6 sm:p-8 md:p-12 shadow-[0_20px_50px_rgba(0,0,0,0.5)] relative overflow-hidden"
+            className="bg-gradient-to-br from-[#4a0505] via-[#290303] to-black border border-gold/35 rounded-[2rem] p-7 sm:p-10 md:p-14 shadow-[0_25px_70px_rgba(0,0,0,0.5)] mb-12 md:mb-16 relative overflow-hidden"
           >
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand-red via-gold to-brand-red"></div>
-
-            <div className="text-center mb-12">
-              <h2 className="font-marker text-4xl md:text-6xl text-brand-red mb-4">Ação Solidária</h2>
-              <p className="text-gray-300 text-base md:text-lg max-w-2xl mx-auto">
-                Sua doação ajuda a equipe a pontuar na gincana e, o mais importante, leva alimento para famílias carentes assistidas pela nossa paróquia.
-              </p>
-            </div>
-
-            <div className="flex flex-col lg:grid lg:grid-cols-3 gap-8 lg:gap-12 items-start">
-              {/* PIX Section */}
-              <div className=" max-lg:w-full flex flex-col items-center justify-center p-6 md:p-8 bg-black/40 rounded-2xl border border-white/5">
-                <h3 className="text-gold font-bold mb-6 text-xl">Doação Financeira (PIX)</h3>
-
-                <div className="w-48 h-48 bg-white p-2 rounded-xl mb-6 shadow-inner flex items-center justify-center overflow-hidden">
-                  <img src="/qrcode.PNG" alt="QR Code PIX" className="w-full h-full object-contain" />
-                </div>
-
-                <div className="w-full relative max-w-sm">
-                  <button
-                    onClick={handleCopyPix}
-                    className="w-full bg-surface-dark border border-gold/50 text-white font-mono py-3 md:py-4 px-4 rounded-xl flex items-center justify-between hover:bg-gold/10 hover:border-gold transition-all group"
-                  >
-                    <span className="truncate mr-4 text-sm md:text-base text-gray-300 select-all">00020126360014br.gov.bcb.pix0114+55779982336765204000053039865802BR5901N6001C62180514Equipevermelha6304C736</span>
-                    {copied ? <Check className="text-green-500 w-5 h-5 flex-shrink-0" /> : <Copy className="text-gold w-5 h-5 group-hover:scale-110 transition-transform flex-shrink-0" />}
-                  </button>
-
-                  <AnimatePresence>
-                    {copied && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 10, scale: 0.8 }}
-                        animate={{ opacity: 1, y: -45, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.8 }}
-                        className="absolute top-0 right-0 bg-green-500 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg flex items-center gap-1"
-                      >
-                        <Check className="w-3 h-3" />
-                        Chave Copiada!
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              </div>
-
-              {/* Food Tracker Section */}
-              <div className="flex flex-col justify-center w-full">
-                <h3 className="text-gold font-bold mb-6 text-xl text-center lg:text-left">Alimentos Prioritários</h3>
-
-                <div className="space-y-6">
-                  {[
-                    { name: 'Arroz', meta: 'Meta: 500kg', progress: '0%' },
-                    { name: 'Feijão', meta: 'Meta: 500kg', progress: '0%' },
-                    { name: 'Óleo de Soja', meta: 'Meta: 200 un.', progress: '0%' },
-                    { name: 'Leite em Pó', meta: 'Meta: 100 latas', progress: '0%' },
-                    // { name: 'Flocão', meta: 'Meta: 100 latas', progress: '0%' },
-                    { name: 'Café', meta: 'Meta: 100 latas', progress: '0%' },
-                    // { name: 'Açúcar', meta: 'Meta: 100 latas', progress: '0%' },
-                    // { name: 'Macarrão', meta: 'Meta: 100 latas', progress: '0%' },
-                    // { name: 'Margarina', meta: 'Meta: 100 latas', progress: '0%' },
-                    // { name: 'Bolacha', meta: 'Meta: 100 latas', progress: '0%' },
-                    // { name: 'Polvilho', meta: 'Meta: 100 latas', progress: '0%' },
-                  ].map((item, idx) => (
-                    <div key={idx} className="w-full">
-                      <div className="flex justify-between text-sm mb-2">
-                        <span className="text-white font-bold">{item.name}</span>
-                        {/* <span className="text-gray-400 font-mono text-xs">{item.meta}</span> */}
-                      </div>
-                      <div className="h-4 w-full bg-black/60 rounded-full overflow-hidden border border-white/5 relative">
-                        <motion.div
-                          initial={{ width: 0 }}
-                          whileInView={{ width: item.progress }}
-                          viewport={{ once: true }}
-                          transition={{ duration: 1.5, delay: 0.2 + (idx * 0.2), ease: "easeOut" }}
-                          className="h-full bg-brand-red rounded-full relative"
-                        >
-                          <div className="absolute top-0 right-0 bottom-0 left-0 bg-[linear-gradient(45deg,rgba(255,255,255,.15)_25%,transparent_25%,transparent_50%,rgba(255,255,255,.15)_50%,rgba(255,255,255,.15)_75%,transparent_75%,transparent)] bg-[length:1rem_1rem] opacity-50"></div>
-                        </motion.div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-              </div>
-
-              {/* Cleaning Tracker Section */}
-              <div className="flex flex-col justify-center w-full">
-                <h3 className="text-gold font-bold mb-6 text-xl text-center lg:text-left">Produtos de Limpeza</h3>
-
-                <div className="space-y-6">
-                  {[
-                    { name: 'Água Sanitária', meta: 'Meta: 100L', progress: '0%' },
-                    { name: 'Sabão em Pó', meta: 'Meta: 100kg', progress: '0%' },
-                    { name: 'Detergente', meta: 'Meta: 200 un.', progress: '0%' },
-                    { name: 'Desinfetante', meta: 'Meta: 100L', progress: '0%' },
-                  ].map((item, idx) => (
-                    <div key={idx} className="w-full">
-                      <div className="flex justify-between text-sm mb-2">
-                        <span className="text-white font-bold">{item.name}</span>
-                        {/* <span className="text-gray-400 font-mono text-xs">{item.meta}</span> */}
-                      </div>
-                      <div className="h-4 w-full bg-black/60 rounded-full overflow-hidden border border-white/5 relative">
-                        <motion.div
-                          initial={{ width: 0 }}
-                          whileInView={{ width: item.progress }}
-                          viewport={{ once: true }}
-                          transition={{ duration: 1.5, delay: 0.2 + (idx * 0.2), ease: "easeOut" }}
-                          className="h-full bg-brand-red rounded-full relative"
-                        >
-                          <div className="absolute top-0 right-0 bottom-0 left-0 bg-[linear-gradient(45deg,rgba(255,255,255,.15)_25%,transparent_25%,transparent_50%,rgba(255,255,255,.15)_50%,rgba(255,255,255,.15)_75%,transparent_75%,transparent)] bg-[length:1rem_1rem] opacity-50"></div>
-                        </motion.div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-            </div>
-
-            <div className="mt-12 p-5 bg-gold/10 rounded-xl border border-gold/20 flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left max-w-2xl mx-auto">
-              <MapPin className="text-gold w-8 h-8 flex-shrink-0 sm:mt-1" />
-              <div>
-                <h4 className="text-white font-bold mb-2">Pontos de Coleta</h4>
-                <p className="text-gray-400 text-sm leading-relaxed">
-                  Será definido em breve
+            <div className="grid min-w-0 grid-cols-1 lg:grid-cols-[minmax(0,1fr)_auto] gap-10 md:gap-14 items-center">
+              <div className="min-w-0">
+                <p className="text-gold font-bold tracking-widest uppercase text-sm mb-4">A forma mais rápida de ajudar</p>
+                <h3 className="text-3xl md:text-5xl font-bold text-white mb-6">Doe agora pelo PIX</h3>
+                <p className="text-gray-300 text-base md:text-lg leading-relaxed mb-8 max-w-2xl">
+                  Sua doação financeira nos permite adquirir exatamente aquilo que estiver faltando. Não existe valor mínimo:
+                  toda contribuição representa um gesto de solidariedade e nos aproxima da nossa meta.
                 </p>
-                {/* <p className="text-gray-400 text-sm leading-relaxed">
-                  Entregue sua doação física no salão da <strong>Paróquia Santo Antônio</strong> (Guanambi-BA) aos finais de semana, informando que é para a <span className="text-brand-red font-bold">Equipe Vermelha</span>.
-                </p> */}
+
+                <button
+                  onClick={handleCopyPix}
+                  className="w-full min-w-0 max-w-2xl overflow-hidden bg-white/5 hover:bg-white/10 border border-gold/40 hover:border-gold rounded-2xl p-4 sm:p-5 text-left transition-all group"
+                >
+                  <span className="block text-xs text-gold uppercase tracking-wider font-bold mb-2">PIX copia e cola</span>
+                  <span className="flex min-w-0 items-center justify-between gap-4">
+                    <span className="block min-w-0 flex-1 truncate text-gray-200 font-mono text-sm select-all">
+                      00020126360014br.gov.bcb.pix0114+55779982336765204000053039865802BR5901N6001C62180514Equipevermelha6304C736
+                    </span>
+                    <span className="shrink-0 bg-gold text-surface-dark w-11 h-11 rounded-xl flex items-center justify-center">
+                      {copied ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5 group-hover:scale-110 transition-transform" />}
+                    </span>
+                  </span>
+                </button>
+
+                <AnimatePresence>
+                  {copied && (
+                    <motion.p
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0 }}
+                      className="text-green-400 font-bold mt-3 flex items-center gap-2"
+                    >
+                      <Check className="w-4 h-4" /> Código PIX copiado!
+                    </motion.p>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              <div className="w-full max-w-[17rem] mx-auto bg-white p-4 sm:p-5 rounded-3xl shadow-[0_0_35px_rgba(212,175,55,0.25)]">
+                <img src="/qrcode.PNG" alt="QR Code para doação via PIX" className="w-full aspect-square object-contain" />
               </div>
             </div>
           </motion.div>
+
+          {/* Formas de contribuir */}
+          <div className="mb-12 md:mb-16">
+            <div className="text-center mb-10">
+              <h3 className="text-2xl md:text-4xl font-bold text-white mb-3">Você também pode doar itens</h3>
+              <p className="text-gray-400 text-base md:text-lg">Escolha uma categoria e fale conosco para combinar a entrega.</p>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-6">
+              {[
+                {
+                  icon: <Sparkles className="w-7 h-7" />,
+                  title: 'Limpeza',
+                  highlight: '4 pontos por unidade',
+                  items: ['Água sanitária', 'Sabão em pó', 'Detergente', 'Desinfetante e outros']
+                },
+                {
+                  icon: <Package className="w-7 h-7" />,
+                  title: 'Higiene pessoal',
+                  highlight: '2 pontos por unidade',
+                  items: ['Sabonete', 'Creme dental', 'Papel higiênico', 'Outros itens de higiene']
+                },
+                {
+                  icon: <Utensils className="w-7 h-7" />,
+                  title: 'Cozinha e utensílios',
+                  highlight: 'Itens coringas',
+                  items: ['Copos, pratos e bandejas', 'Panelas e escorredores', 'Talheres e utensílios para servir', 'Itens para cozinha industrial']
+                }
+              ].map((category, idx) => (
+                <motion.div
+                  key={category.title}
+                  initial={{ opacity: 0, y: 24 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: idx * 0.12 }}
+                  className="bg-white/[0.035] border border-white/10 hover:border-gold/40 rounded-3xl p-7 md:p-8 transition-colors"
+                >
+                  <div className="w-14 h-14 bg-gold/10 text-gold rounded-2xl flex items-center justify-center mb-6">{category.icon}</div>
+                  <h4 className="text-xl font-bold text-white mb-2">{category.title}</h4>
+                  <ul className="space-y-3 text-gray-400">
+                    {category.items.map((item) => (
+                      <li key={item} className="flex gap-3">
+                        <Check className="w-4 h-4 text-gold shrink-0 mt-1" />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+
+          <div className="grid lg:grid-cols-[1fr_auto] gap-8 items-center bg-gold/10 border border-gold/25 rounded-3xl p-7 md:p-10">
+            <div className="flex flex-col sm:flex-row gap-5">
+              <ShieldCheck className="text-gold w-11 h-11 shrink-0" />
+              <div>
+                <h3 className="text-xl md:text-2xl font-bold text-white mb-3">Atenção às condições dos produtos</h3>
+                <p className="text-gray-300 leading-relaxed">
+                  Os itens devem estar <strong>lacrados, dentro do prazo de validade e em boas condições de uso</strong>.
+                  Produtos vencidos, abertos, danificados ou impróprios não poderão ser contabilizados.
+                </p>
+              </div>
+            </div>
+
+            <a
+              href="https://wa.me/5577998233676?text=Ol%C3%A1%21%20Quero%20ajudar%20a%20Equipe%20Vermelha%20com%20uma%20doa%C3%A7%C3%A3o.%20Como%20posso%20entregar%3F"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-3 bg-green-600 hover:bg-green-500 text-white font-bold py-4 px-7 rounded-full transition-all hover:scale-105 shadow-[0_10px_30px_rgba(22,163,74,0.25)] whitespace-nowrap"
+            >
+              <MessageCircle className="w-6 h-6" />
+              Falar no WhatsApp
+            </a>
+          </div>
+
+          <p className="text-center text-gray-400 mt-7">
+            Contato para doações: <a href="https://wa.me/5577998233676?text=Ol%C3%A1%21%20Quero%20ajudar%20a%20Equipe%20Vermelha%20com%20uma%20doa%C3%A7%C3%A3o.%20Como%20posso%20entregar%3F" className="text-white font-bold hover:text-gold transition-colors">(77) 99823-3676</a>
+          </p>
         </div>
       </section>
 
