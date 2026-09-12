@@ -107,11 +107,11 @@ export default function Comprovante() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             <div>
               <div className="text-sm text-gray-500 uppercase tracking-wider mb-1">Comprador</div>
-              <div className="font-bold text-xl text-gray-800">{comprovante.comprador_nome}</div>
+              <div className="font-bold text-xl text-gray-800">{comprovante.comprador}</div>
             </div>
             <div>
               <div className="text-sm text-gray-500 uppercase tracking-wider mb-1">Data do Pagamento</div>
-              <div className="font-bold text-lg text-gray-800">{formatDate(comprovante.pago_em)}</div>
+              <div className="font-bold text-lg text-gray-800">{formatDate(comprovante.pagoEm)}</div>
             </div>
             <div>
               <div className="text-sm text-gray-500 uppercase tracking-wider mb-1">Organizador</div>
@@ -119,11 +119,11 @@ export default function Comprovante() {
             </div>
             <div>
               <div className="text-sm text-gray-500 uppercase tracking-wider mb-1">Valor Pago</div>
-              <div className="font-bold text-lg text-green-600">{formatCurrency(comprovante.valor_pago_centavos)}</div>
+              <div className="font-bold text-lg text-green-600">{formatCurrency(comprovante.valorCentavos)}</div>
             </div>
             <div className="md:col-span-2">
               <div className="text-sm text-gray-500 uppercase tracking-wider mb-1">Prêmio Concorrendo</div>
-              <div className="font-bold text-lg text-gray-800">{comprovante.premio || 'Air Fryer'}</div>
+              <div className="font-bold text-lg text-gray-800">Air Fryer</div>
             </div>
           </div>
 

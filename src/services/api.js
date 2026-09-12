@@ -1,4 +1,5 @@
-const API_URL = 'https://backend-rifa-ijgv.onrender.com/api';
+// const API_URL = 'https://backend-rifa-ijgv.onrender.com/api';
+const API_URL = 'http://localhost:3000/api';
 
 export const fetchRifa = async () => {
   const response = await fetch(`${API_URL}/rifa`);
@@ -18,8 +19,8 @@ export const fetchComprovante = async (codigo) => {
   return await response.json();
 };
 
-export const reservarTicket = async (dadosDaReserva) => {
-  const response = await fetch(`${API_URL}/rifa/reservar`, {
+export const checkoutPix = async (dadosDaReserva) => {
+  const response = await fetch(`${API_URL}/pedidos/checkout-pix`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -30,11 +31,11 @@ export const reservarTicket = async (dadosDaReserva) => {
   if (!response.ok) {
     if (response.status === 409) {
       const errorData = await response.json().catch(() => ({}));
-      const error = new Error(errorData.error || 'Número já reservado ou indisponível.');
+      const error = new Error(errorData.error || 'Um ou mais números já foram reservados.');
       error.status = 409;
       throw error;
     }
-    throw new Error('Erro ao reservar o número');
+    throw new Error('Erro ao processar o pagamento Pix');
   }
 
   return await response.json();
@@ -96,5 +97,13 @@ export const updateTicketStatus = async (numero, status, token) => {
     throw new Error('Erro ao atualizar status');
   }
 
+  return await response.json();
+};
+
+export const fetchMeusBilhetes = async (cpf) => {
+  const response = await fetch(`${API_URL}/rifa/meus-bilhetes/${cpf}`);
+  if (!response.ok) {
+    throw new Error('Erro ao buscar bilhetes');
+  }
   return await response.json();
 };
