@@ -65,7 +65,7 @@ export default function Tickets() {
         try {
           const data = await fetchRifa();
           setRifaData(data);
-          
+
           const allPaid = selectedTickets.length > 0 && selectedTickets.every(st => {
             const ticket = data.tickets.find(t => t.numero === st.numero);
             return ticket?.status === 'PAGO';
@@ -188,7 +188,7 @@ export default function Tickets() {
         </Link>
       </header>
 
-      <main className="max-w-6xl mx-auto px-4 mt-8 sm:mt-12">
+      <main className="max-w-6xl mx-auto px-4 mt-8 sm:mt-12 max-lg:mb-14">
         <div className="flex flex-col items-center">
           <h1 className="font-marker text-5xl md:text-7xl text-brand-red mb-4 text-center">Escolha seus Números</h1>
           {rifaData && (
@@ -201,7 +201,7 @@ export default function Tickets() {
             Selecione os números que deseja comprar. Ao finalizar, preencha seus dados para gerar o código PIX.
           </p>
 
-          <div className="flex gap-4 mb-8 text-sm max-lg:flex-wrap max-lg:">
+          <div className="flex gap-4 mb-8 text-sm max-lg:flex-wrap max-lg:justify-center">
             <div className="flex items-center gap-2"><div className="w-4 h-4 bg-green-600 rounded"></div> Livre</div>
             <div className="flex items-center gap-2"><div className="w-4 h-4 bg-white rounded border border-gray-300"></div> Selecionado</div>
             <div className="flex items-center gap-2"><div className="w-4 h-4 bg-yellow-600 rounded"></div> Reservado</div>
@@ -287,7 +287,7 @@ export default function Tickets() {
                       className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-white focus:border-gold outline-none"
                     />
                   </div>
-                  
+
                   <div>
                     <label className="text-xs text-gold uppercase tracking-wider mb-1 block">Telefone</label>
                     <input
@@ -305,8 +305,8 @@ export default function Tickets() {
                     />
                   </div>
 
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     onClick={() => setShowComplementaryFields(!showComplementaryFields)}
                     className="text-gold text-sm flex items-center gap-1 hover:underline self-start font-medium"
                   >
@@ -316,10 +316,10 @@ export default function Tickets() {
 
                   <AnimatePresence>
                     {showComplementaryFields && (
-                      <motion.div 
-                        initial={{ height: 0, opacity: 0 }} 
-                        animate={{ height: 'auto', opacity: 1 }} 
-                        exit={{ height: 0, opacity: 0 }} 
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
                         className="flex flex-col gap-4 overflow-hidden"
                       >
                         <div>
@@ -356,7 +356,7 @@ export default function Tickets() {
               </>
             ) : paymentConfirmed ? (
               <div className="flex flex-col items-center text-center py-6">
-                <motion.div 
+                <motion.div
                   initial={{ scale: 0 }} animate={{ scale: 1 }}
                   className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-[0_0_30px_rgba(34,197,94,0.5)]"
                 >
