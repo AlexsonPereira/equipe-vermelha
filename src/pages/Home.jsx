@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Crown, HeartHandshake, Copy, Check, Church, Flame, Smartphone, Quote, Ticket, ChevronLeft, ChevronRight, Globe2, ExternalLink, Search, MessageCircle, Package, ShieldCheck, Utensils, Sparkles, ShoppingBasket, MapPin, Clock } from 'lucide-react';
+import { InstagramEmbed } from 'react-social-media-embed';
 
 const InstagramIcon = ({ className }) => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
@@ -612,31 +613,49 @@ export default function Home() {
       </section>
 
       {/* 6. Instagram */}
-      <section className="py-20 px-6 bg-gradient-to-b from-surface-dark to-black relative overflow-hidden">
-        <div className="max-w-4xl mx-auto text-center relative z-10">
+      <section className="py-24 px-6 bg-gradient-to-b from-surface-dark to-black relative overflow-hidden">
+        <div className="max-w-7xl mx-auto relative z-10">
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
+            className="text-center mb-16"
           >
-            <div className="w-20 h-20 bg-gradient-to-tr from-[#f09433] via-[#e6683c] via-[#dc2743] via-[#cc2366] to-[#bc1888] rounded-2xl flex items-center justify-center mx-auto mb-8 shadow-lg shadow-red-900/20">
-              <InstagramIcon className="w-10 h-10 text-white" />
+            <div className="w-16 h-16 bg-gradient-to-tr from-[#f09433] via-[#e6683c] via-[#dc2743] via-[#cc2366] to-[#bc1888] rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-red-900/20">
+              <InstagramIcon className="w-8 h-8 text-white" />
             </div>
             <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">Siga a Equipe Vermelha</h2>
-            <p className="text-gray-400 text-lg mb-10 max-w-2xl mx-auto leading-relaxed">
-              Acompanhe de perto as provas da gincana, os bastidores, nossas ações solidárias e muito mais diretamente no nosso Instagram!
+            <p className="text-gray-400 text-lg mb-8 max-w-2xl mx-auto leading-relaxed">
+              Acompanhe de perto as provas da gincana, os bastidores, nossas ações solidárias e muito mais!
             </p>
             <a
               href="https://www.instagram.com/equipevermelha.mac/"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-3 bg-white/5 border border-white/10 hover:border-white/30 hover:bg-white/10 text-white font-bold py-4 px-8 rounded-full transition-all hover:scale-105"
+              className="inline-flex items-center gap-3 bg-white/5 border border-white/10 hover:border-white/30 hover:bg-white/10 text-white font-bold py-3 px-8 rounded-full transition-all hover:scale-105"
             >
-              <InstagramIcon className="w-6 h-6" />
+              <InstagramIcon className="w-5 h-5" />
               @equipevermelha.mac
             </a>
           </motion.div>
+
+          <div className="flex flex-wrap justify-center gap-8">
+            {/* Post 1 - Substitua o link em 'url' pelo link do seu post */}
+            <div className="w-full max-w-[328px] h-fit overflow-hidden rounded-2xl shadow-xl shadow-black/80  bg-white/5">
+              <InstagramEmbed url="https://www.instagram.com/p/DcuB1OFukRJ/" width="100%" />
+            </div>
+
+            {/* Post 2 - Substitua o link em 'url' pelo link do seu post */}
+            <div className="w-full max-w-[328px] h-fit overflow-hidden rounded-2xl shadow-xl shadow-black/80  bg-white/5">
+              <InstagramEmbed url="https://www.instagram.com/p/Dc7clakNTSJ/" width="100%" />
+            </div>
+
+            {/* Post 3 - Substitua o link em 'url' pelo link do seu post */}
+            <div className="w-full max-w-[328px] h-fit overflow-hidden rounded-2xl shadow-xl shadow-black/80  bg-white/5">
+              <InstagramEmbed url="https://www.instagram.com/p/DdEqAJrOYv-/" width="100%" />
+            </div>
+          </div>
         </div>
       </section>
 
