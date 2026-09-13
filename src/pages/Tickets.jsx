@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { fetchRifa, checkoutPix } from '../services/api';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Ticket, X, CheckCircle, Copy, QrCode, DollarSign, ArrowRight, Clock, MessageCircle, Check, Search } from 'lucide-react';
+import { Ticket, X, CheckCircle, Copy, QrCode, DollarSign, ArrowRight, Clock, MessageCircle, Check, Search, ChevronDown, ChevronUp } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 
 const formatPhone = (value) => {
@@ -29,6 +29,7 @@ export default function Tickets() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [formData, setFormData] = useState({ nome: '', telefone: '', email: '', cpf: '', endereco: '' });
+  const [showComplementaryFields, setShowComplementaryFields] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [pixData, setPixData] = useState(null);
@@ -125,8 +126,8 @@ export default function Tickets() {
         comprador: {
           nome: formData.nome,
           telefone: formData.telefone,
-          email: formData.email,
-          cpf: formData.cpf,
+          email: formData.email || 'anonimo@rifa.com',
+          cpf: formData.cpf || '123.456.789-09',
           endereco: formData.endereco,
         }
       });
@@ -286,30 +287,14 @@ export default function Tickets() {
                       className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-white focus:border-gold outline-none"
                     />
                   </div>
+                  
                   <div>
-                    <label className="text-xs text-gold uppercase tracking-wider mb-1 block">E-mail *</label>
+                    <label className="text-xs text-gold uppercase tracking-wider mb-1 block">Telefone</label>
                     <input
-                      type="email" name="email" value={formData.email} onChange={handleFormChange} required
+                      type="tel" name="telefone" value={formData.telefone} onChange={handleFormChange}
+                      placeholder="(00) 00000-0000"
                       className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-white focus:border-gold outline-none"
                     />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-xs text-gold uppercase tracking-wider mb-1 block">CPF *</label>
-                      <input
-                        type="text" name="cpf" value={formData.cpf} onChange={handleFormChange} required maxLength="14"
-                        placeholder="000.000.000-00"
-                        className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-white focus:border-gold outline-none"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-xs text-gold uppercase tracking-wider mb-1 block">Telefone</label>
-                      <input
-                        type="tel" name="telefone" value={formData.telefone} onChange={handleFormChange}
-                        placeholder="(00) 00000-0000"
-                        className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-white focus:border-gold outline-none"
-                      />
-                    </div>
                   </div>
                   <div>
                     <label className="text-xs text-gold uppercase tracking-wider mb-1 block">Endereço</label>
@@ -319,6 +304,42 @@ export default function Tickets() {
                       className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-white focus:border-gold outline-none"
                     />
                   </div>
+
+                  <button 
+                    type="button" 
+                    onClick={() => setShowComplementaryFields(!showComplementaryFields)}
+                    className="text-gold text-sm flex items-center gap-1 hover:underline self-start font-medium"
+                  >
+                    {showComplementaryFields ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                    {showComplementaryFields ? 'Ocultar campos complementares' : 'Adicionar E-mail e CPF (Opcional)'}
+                  </button>
+
+                  <AnimatePresence>
+                    {showComplementaryFields && (
+                      <motion.div 
+                        initial={{ height: 0, opacity: 0 }} 
+                        animate={{ height: 'auto', opacity: 1 }} 
+                        exit={{ height: 0, opacity: 0 }} 
+                        className="flex flex-col gap-4 overflow-hidden"
+                      >
+                        <div>
+                          <label className="text-xs text-gold uppercase tracking-wider mb-1 block">E-mail</label>
+                          <input
+                            type="email" name="email" value={formData.email} onChange={handleFormChange}
+                            className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-white focus:border-gold outline-none"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-xs text-gold uppercase tracking-wider mb-1 block">CPF</label>
+                          <input
+                            type="text" name="cpf" value={formData.cpf} onChange={handleFormChange} maxLength="14"
+                            placeholder="000.000.000-00"
+                            className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-white focus:border-gold outline-none"
+                          />
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
 
                   <button
                     type="submit"
