@@ -33,10 +33,10 @@ export default function MeusBilhetes() {
       setError('CPF inválido');
       return;
     }
-    
+
     setLoading(true);
     setError('');
-    
+
     try {
       const data = await fetchMeusBilhetes(searchCpf);
       setTickets(data.tickets || []);
@@ -76,7 +76,7 @@ export default function MeusBilhetes() {
         <form onSubmit={handleSearch} className="flex flex-col gap-4 mb-8">
           <div>
             <label className="text-xs text-gold uppercase tracking-wider mb-2 block font-medium">CPF do Comprador</label>
-            <div className="flex gap-3">
+            <div className="flex gap-3 max-lg:flex-col">
               <input
                 type="text"
                 value={cpf}
@@ -88,7 +88,7 @@ export default function MeusBilhetes() {
               <button
                 type="submit"
                 disabled={loading || !cpf}
-                className="bg-brand-red hover:bg-red-700 disabled:opacity-50 text-white px-6 rounded-xl font-bold transition-all shadow-[0_0_15px_rgba(179,0,0,0.3)] flex items-center gap-2"
+                className="bg-brand-red hover:bg-red-700 disabled:opacity-50 text-white px-6 rounded-xl font-bold transition-all shadow-[0_0_15px_rgba(179,0,0,0.3)] flex items-center gap-2 max-lg:h-12"
               >
                 {loading ? 'Buscando...' : <><Search className="w-5 h-5" /> Buscar</>}
               </button>
@@ -114,12 +114,12 @@ export default function MeusBilhetes() {
                     <div className="absolute top-0 right-0 bg-green-600/20 text-green-500 px-3 py-1 text-xs font-bold rounded-bl-lg flex items-center gap-1 border-b border-l border-green-500/20">
                       <CheckCircle className="w-3 h-3" /> PAGO
                     </div>
-                    
+
                     <div className="text-3xl font-bold text-white mb-1">#{ticket.numero}</div>
                     <div className="text-sm text-gray-400 mb-4">{ticket.comprador_nome}</div>
-                    
+
                     <div className="mt-auto pt-4 border-t border-white/5">
-                      <Link 
+                      <Link
                         to={`/comprovante/${ticket.comprovante_codigo}`}
                         className="block w-full py-2 text-center bg-white/5 hover:bg-white/10 text-gold rounded-lg text-sm font-bold transition-colors"
                       >
