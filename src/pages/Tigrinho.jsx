@@ -45,15 +45,6 @@ const createRandomReel = () => Array.from({ length: 3 }, () => randomItem(SYMBOL
 const createSpinResult = () => {
   const nextReels = Array.from({ length: 3 }, createRandomReel);
 
-  // O easter egg favorece algumas vitórias para manter a brincadeira divertida.
-  if (Math.random() < 0.3) {
-    const luckyLine = randomItem(WIN_LINES);
-    const luckySymbol = randomItem(SYMBOL_POOL);
-    luckyLine.cells.forEach(([columnIndex, rowIndex]) => {
-      nextReels[columnIndex][rowIndex] = luckySymbol;
-    });
-  }
-
   return nextReels;
 };
 
