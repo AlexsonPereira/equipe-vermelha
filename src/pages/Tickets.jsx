@@ -19,6 +19,47 @@ const formatCpf = (value) => {
   return digits.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
 };
 
+const LoadingAnimation = () => {
+  const [loadingText, setLoadingText] = useState('Acordando o servidor (pode levar até 50s na primeira vez)...');
+  const messages = [
+    'Acordando o servidor (pode levar até 50s na primeira vez)...',
+    'Organizando os bilhetes da sorte...',
+    'Quase lá, não desista...',
+    'Ajeitando os últimos detalhes...',
+    'Já está vindo, prometo!'
+  ];
+
+  useEffect(() => {
+    let index = 0;
+    const interval = setInterval(() => {
+      index = (index + 1) % messages.length;
+      setLoadingText(messages[index]);
+    }, 10000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="flex flex-col items-center justify-center py-20 w-full">
+      <motion.div
+        animate={{ rotate: 360 }}
+        transition={{ repeat: Infinity, duration: 1.2, ease: "linear" }}
+        className="w-16 h-16 border-4 border-white/10 border-t-gold rounded-full mb-6"
+      />
+      <AnimatePresence mode="wait">
+        <motion.p
+          key={loadingText}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          className="text-gold font-bold text-lg text-center max-w-md"
+        >
+          {loadingText}
+        </motion.p>
+      </AnimatePresence>
+    </div>
+  );
+};
+
 export default function Tickets() {
   const navigate = useNavigate();
   const [rifaData, setRifaData] = useState(null);
@@ -209,7 +250,7 @@ export default function Tickets() {
           </div>
 
           {loading ? (
-            <div className="text-gold mt-10">Carregando números...</div>
+            <LoadingAnimation />
           ) : (
             <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-10 gap-3 w-full">
               {rifaData?.tickets?.map((t) => (

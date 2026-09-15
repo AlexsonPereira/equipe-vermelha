@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { fetchRifa } from '../services/api';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Crown, HeartHandshake, Copy, Check, Church, Flame, Smartphone, Quote, Ticket, ChevronLeft, ChevronRight, Globe2, ExternalLink, Search, MessageCircle, Package, ShieldCheck, Utensils, Sparkles, ShoppingBasket, MapPin, Clock } from 'lucide-react';
 import { InstagramEmbed } from 'react-social-media-embed';
@@ -20,6 +21,11 @@ const copyToClipboard = (text) => {
 };
 
 export default function Home() {
+  // Wake up the API silently
+  useEffect(() => {
+    fetchRifa().catch(() => {});
+  }, []);
+
   const [copied, setCopied] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
@@ -370,6 +376,29 @@ export default function Home() {
       </section>
 
 
+      {/* 3d. Quiz Carlo Acutis */}
+      <section className="py-24 px-6 bg-gradient-to-t from-surface-dark to-primary/10 relative overflow-hidden">
+        <div className="max-w-5xl mx-auto relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="bg-gradient-to-br from-[#4a0505] via-brand-red to-black border border-gold/40 rounded-3xl p-8 md:p-12 text-center shadow-[0_0_35px_rgba(179,0,0,0.4)]"
+          >
+            <div className="w-16 h-16 bg-gold text-surface-dark rounded-full flex items-center justify-center mx-auto mb-6">
+              <Sparkles className="w-8 h-8" />
+            </div>
+            <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">Você conhece bem o nosso padroeiro?</h2>
+            <p className="text-gray-300 text-lg mb-8 max-w-2xl mx-auto">
+              Preparamos um mini game divertido de perguntas e respostas sobre a vida de São Carlo Acutis. Mostre o que sabe e alcance a pontuação máxima!
+            </p>
+            <Link to="/quiz" className="inline-flex items-center gap-2 bg-gold hover:bg-yellow-500 text-surface-dark font-bold py-4 px-8 rounded-full shadow-[0_0_20px_rgba(212,175,55,0.4)] transition-all hover:scale-105">
+              Jogar Agora <ExternalLink className="w-5 h-5" />
+            </Link>
+          </motion.div>
+        </div>
+      </section>
 
       {/* 4. Nossa Rifa */}
       <section id="rifa" className="py-24 px-6 bg-gradient-to-b from-primary/10 to-surface-dark relative overflow-hidden">
