@@ -5,6 +5,7 @@ import Tickets from './pages/Tickets';
 import Admin from './pages/Admin';
 import Comprovante from './pages/Comprovante';
 import MeusBilhetes from './pages/MeusBilhetes';
+import Tigrinho from './pages/Tigrinho';
 
 export default function App() {
   return (
@@ -14,6 +15,7 @@ export default function App() {
       <Route path="/admin" element={<Admin />} />
       <Route path="/comprovante/:codigo" element={<Comprovante />} />
       <Route path="/meus-bilhetes" element={<MeusBilhetes />} />
+      <Route path="/sala-secreta/tigrinho" element={<Tigrinho />} />
     </Routes>
   );
 }

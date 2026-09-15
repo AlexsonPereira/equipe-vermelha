@@ -1,0 +1,381 @@
+.tiger-game-page {
+  --tiger-gold: #f8cc59;
+  --tiger-deep-red: #450706;
+  position: relative;
+  isolation: isolate;
+  background:
+    radial-gradient(circle at 50% -10%, rgba(255, 177, 25, 0.28), transparent 36rem),
+    radial-gradient(circle at 10% 45%, rgba(179, 0, 0, 0.35), transparent 28rem),
+    linear-gradient(145deg, #120202 0%, #270504 48%, #0c0202 100%);
+}
+
+.tiger-game-page::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  content: '';
+  opacity: 0.13;
+  background-image:
+    linear-gradient(30deg, rgba(255, 220, 120, 0.28) 12%, transparent 12.5%, transparent 87%, rgba(255, 220, 120, 0.28) 87.5%),
+    linear-gradient(150deg, rgba(255, 220, 120, 0.28) 12%, transparent 12.5%, transparent 87%, rgba(255, 220, 120, 0.28) 87.5%);
+  background-position: 0 0, 0 0;
+  background-size: 46px 80px;
+  pointer-events: none;
+}
+
+.tiger-ambient {
+  position: fixed;
+  z-index: -1;
+  width: 22rem;
+  height: 22rem;
+  border-radius: 999px;
+  filter: blur(90px);
+  pointer-events: none;
+}
+
+.tiger-ambient--one {
+  top: -8rem;
+  right: -7rem;
+  background: rgba(255, 171, 23, 0.18);
+}
+
+.tiger-ambient--two {
+  bottom: -9rem;
+  left: -8rem;
+  background: rgba(179, 0, 0, 0.28);
+}
+
+.tiger-machine {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 218, 124, 0.34);
+  border-radius: 2rem;
+  background: linear-gradient(160deg, rgba(100, 13, 8, 0.96), rgba(41, 4, 3, 0.98));
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    0 0 50px rgba(179, 0, 0, 0.18);
+}
+
+.tiger-machine::after {
+  position: absolute;
+  inset: 0;
+  content: '';
+  border-radius: inherit;
+  box-shadow: inset 0 0 38px rgba(255, 175, 35, 0.08);
+  pointer-events: none;
+}
+
+.tiger-machine__marquee {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-bottom: 1px solid rgba(255, 217, 112, 0.28);
+  background:
+    linear-gradient(110deg, rgba(255, 255, 255, 0.08), transparent 34%),
+    linear-gradient(180deg, #8d1710, #5b0806);
+}
+
+.tiger-machine__marquee::before {
+  position: absolute;
+  inset: 0.45rem;
+  content: '';
+  border: 1px dashed rgba(255, 218, 124, 0.42);
+  border-radius: 1.25rem;
+  pointer-events: none;
+}
+
+.tiger-logo {
+  display: grid;
+  width: 3.25rem;
+  height: 3.25rem;
+  place-items: center;
+  border: 2px solid rgba(255, 241, 184, 0.72);
+  border-radius: 999px;
+  color: #4b0906;
+  background: radial-gradient(circle at 35% 25%, #fff4b6, #e8a928 72%);
+  box-shadow: 0 0 24px rgba(248, 204, 89, 0.28);
+}
+
+.tiger-demo-badge {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 3.25rem;
+  min-height: 2rem;
+  padding: 0.35rem 0.55rem;
+  border: 1px solid rgba(255, 226, 146, 0.6);
+  border-radius: 999px;
+  color: #fff2c0;
+  background: rgba(27, 2, 2, 0.34);
+  font-size: 0.75rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.tiger-stat-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  column-gap: 0.35rem;
+  min-width: 0;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  color: rgba(255, 255, 255, 0.58);
+  background: rgba(0, 0, 0, 0.24);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.tiger-stat-card strong {
+  grid-column: 1 / -1;
+  overflow: hidden;
+  margin-top: 0.15rem;
+  color: #fff5d6;
+  font-size: clamp(1.05rem, 3vw, 1.45rem);
+  line-height: 1.1;
+  text-overflow: ellipsis;
+}
+
+.tiger-reel-board {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(0.35rem, 1.5vw, 0.75rem);
+  overflow: hidden;
+  padding: clamp(0.45rem, 1.8vw, 0.85rem);
+  border: clamp(4px, 1vw, 8px) solid #df9f26;
+  border-radius: 1.5rem;
+  background: linear-gradient(135deg, #ffd76c, #8b4e0b 52%, #ffe59c);
+  box-shadow:
+    inset 0 0 0 2px rgba(82, 32, 0, 0.7),
+    0 16px 38px rgba(0, 0, 0, 0.42),
+    0 0 30px rgba(246, 178, 41, 0.16);
+}
+
+.tiger-reel {
+  display: grid;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid rgba(92, 44, 3, 0.38);
+  border-radius: 1rem;
+  background: #fff7d6;
+  box-shadow: inset 0 6px 18px rgba(72, 27, 0, 0.23);
+  will-change: transform;
+}
+
+.tiger-reel--spinning {
+  filter: saturate(0.88) blur(0.65px);
+}
+
+.tiger-symbol-cell {
+  position: relative;
+  display: grid;
+  min-height: clamp(4.25rem, 14vw, 7.25rem);
+  place-items: center;
+  overflow: hidden;
+  border-bottom: 1px solid rgba(124, 72, 13, 0.2);
+  background:
+    radial-gradient(circle at 50% 42%, rgba(255, 255, 255, 0.95), transparent 62%),
+    linear-gradient(180deg, #fff9df, #f3cf7a);
+  font-size: clamp(2.1rem, 8vw, 4.75rem);
+  line-height: 1;
+  text-shadow: 0 3px 2px rgba(70, 28, 0, 0.16);
+}
+
+.tiger-symbol-cell:last-child {
+  border-bottom: 0;
+}
+
+.tiger-symbol-cell::after {
+  position: absolute;
+  inset: 0;
+  content: '';
+  box-shadow: inset 0 0 16px rgba(90, 39, 0, 0.12);
+  pointer-events: none;
+}
+
+.tiger-symbol-cell--winning {
+  z-index: 2;
+  background:
+    radial-gradient(circle at center, #fff7ad, #ffc33b 62%, #e88c0a);
+  box-shadow: inset 0 0 0 3px rgba(255, 242, 151, 0.9), 0 0 26px rgba(255, 211, 69, 0.9);
+  animation: tiger-win-pulse 0.75s ease-in-out 2;
+}
+
+.tiger-payline {
+  position: absolute;
+  right: 0.15rem;
+  left: 0.15rem;
+  height: 2px;
+  opacity: 0.22;
+  background: linear-gradient(90deg, transparent, #8f190b 8%, #8f190b 92%, transparent);
+  pointer-events: none;
+}
+
+.tiger-payline--top {
+  top: 16.666%;
+}
+
+.tiger-payline--middle {
+  top: 50%;
+  opacity: 0.32;
+}
+
+.tiger-payline--bottom {
+  top: 83.333%;
+}
+
+.tiger-line-indicator {
+  display: grid;
+  width: 1.75rem;
+  height: 1.75rem;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.48);
+  background: rgba(0, 0, 0, 0.22);
+  font-size: 0.75rem;
+  font-weight: 900;
+  transition: 180ms ease;
+}
+
+.tiger-line-indicator--active {
+  border-color: #ffe289;
+  color: #4a0805;
+  background: #f8cc59;
+  box-shadow: 0 0 16px rgba(248, 204, 89, 0.62);
+  transform: scale(1.12);
+}
+
+.tiger-bet-button {
+  min-width: 3.2rem;
+  min-height: 2.75rem;
+  padding: 0.45rem 0.7rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 0.9rem;
+  color: rgba(255, 255, 255, 0.68);
+  background: rgba(255, 255, 255, 0.06);
+  font-size: 0.9rem;
+  font-weight: 900;
+  transition: 160ms ease;
+}
+
+.tiger-bet-button:hover:not(:disabled) {
+  border-color: rgba(248, 204, 89, 0.62);
+  color: #fff0ba;
+}
+
+.tiger-bet-button--active {
+  border-color: #f8cc59;
+  color: #3d0905;
+  background: linear-gradient(180deg, #ffe895, #efb62c);
+  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.24);
+}
+
+.tiger-bet-button:focus-visible,
+.tiger-spin-button:focus-visible {
+  outline: 2px solid #fde68a;
+  outline-offset: 3px;
+}
+
+.tiger-bet-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.tiger-spin-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  padding: 0.8rem 1.35rem;
+  border: 2px solid #ffe6a0;
+  border-radius: 999px;
+  color: #450706;
+  background: linear-gradient(180deg, #fff09f 0%, #f7bd2e 58%, #d98c10 100%);
+  box-shadow:
+    0 7px 0 #8d3909,
+    0 12px 24px rgba(0, 0, 0, 0.34),
+    0 0 28px rgba(248, 204, 89, 0.32);
+  font-weight: 1000;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  transition: transform 150ms ease, filter 150ms ease, box-shadow 150ms ease;
+}
+
+.tiger-spin-button:hover:not(:disabled) {
+  filter: brightness(1.08);
+  transform: translateY(-2px);
+  box-shadow:
+    0 9px 0 #8d3909,
+    0 15px 28px rgba(0, 0, 0, 0.36),
+    0 0 34px rgba(248, 204, 89, 0.4);
+}
+
+.tiger-spin-button:active:not(:disabled) {
+  transform: translateY(5px);
+  box-shadow: 0 2px 0 #8d3909, 0 6px 14px rgba(0, 0, 0, 0.34);
+}
+
+.tiger-spin-button:disabled {
+  cursor: not-allowed;
+  filter: grayscale(0.62);
+  opacity: 0.55;
+  box-shadow: 0 4px 0 #71320d;
+}
+
+.tiger-side-card {
+  padding: 1.25rem;
+  border: 1px solid rgba(255, 218, 124, 0.24);
+  border-radius: 1.5rem;
+  background: linear-gradient(160deg, rgba(83, 10, 7, 0.88), rgba(25, 3, 3, 0.86));
+  box-shadow: 0 20px 52px rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(12px);
+}
+
+@keyframes tiger-win-pulse {
+  0%, 100% {
+    filter: brightness(1);
+    transform: scale(1);
+  }
+  50% {
+    filter: brightness(1.12);
+    transform: scale(1.035);
+  }
+}
+
+@media (max-width: 420px) {
+  .tiger-machine__marquee {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .tiger-demo-badge {
+    position: absolute;
+    top: 0.7rem;
+    right: 0.75rem;
+    min-width: auto;
+    min-height: 1.6rem;
+    padding: 0.2rem 0.45rem;
+    font-size: 0.65rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tiger-symbol-cell--winning {
+    animation: none;
+  }
+
+  .tiger-line-indicator,
+  .tiger-bet-button,
+  .tiger-spin-button {
+    scroll-behavior: auto;
+    transition-duration: 0.01ms;
+  }
+}
