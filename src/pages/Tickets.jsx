@@ -78,9 +78,23 @@ export default function Tickets() {
   const [errorMessage, setErrorMessage] = useState('');
   const [paymentConfirmed, setPaymentConfirmed] = useState(false);
   const [timeLeft, setTimeLeft] = useState(300);
+  const [pendingPix, setPendingPix] = useState(null);
 
   useEffect(() => {
     loadRifaData();
+    const stored = localStorage.getItem('pendingPix');
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        if (new Date(parsed.expiraEm) > new Date()) {
+          setPendingPix(parsed);
+        } else {
+          localStorage.removeItem('pendingPix');
+        }
+      } catch (e) {
+        localStorage.removeItem('pendingPix');
+      }
+    }
   }, []);
 
   useEffect(() => {
@@ -114,6 +128,8 @@ export default function Tickets() {
 
           if (allPaid) {
             setPaymentConfirmed(true);
+            localStorage.removeItem('pendingPix');
+            setPendingPix(null);
           }
         } catch (error) {
           console.error('Erro no polling:', error);
@@ -132,6 +148,20 @@ export default function Tickets() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleRecoverPix = () => {
+    if (!pendingPix) return;
+    setSelectedTickets(pendingPix.numeros.map(n => ({ numero: n })));
+    setPixData(pendingPix.pixData);
+    const diff = Math.floor((new Date(pendingPix.expiraEm) - new Date()) / 1000);
+    setTimeLeft(diff > 0 ? diff : 0);
+    setIsModalOpen(true);
+  };
+  
+  const handleCancelPendingPix = () => {
+    localStorage.removeItem('pendingPix');
+    setPendingPix(null);
   };
 
   const handleTicketClick = (ticket) => {
@@ -173,7 +203,19 @@ export default function Tickets() {
         }
       });
       setPixData(result.pix);
-      setTimeLeft(300);
+      
+      const diff = Math.floor((new Date(result.expiraEm) - new Date()) / 1000);
+      setTimeLeft(diff > 0 ? diff : 300);
+      
+      const pendingData = {
+        pixData: result.pix,
+        expiraEm: result.expiraEm,
+        numeros: selectedTickets.map(t => t.numero),
+        totalCentavos: totalCentavos
+      };
+      localStorage.setItem('pendingPix', JSON.stringify(pendingData));
+      setPendingPix(pendingData);
+
       await loadRifaData();
     } catch (error) {
       if (error.status === 409) {
@@ -228,6 +270,40 @@ export default function Tickets() {
           <Search className="w-4 h-4" /> Meus Bilhetes
         </Link>
       </header>
+
+      {/* Pending Pix Banner */}
+      <AnimatePresence>
+        {pendingPix && !isModalOpen && !paymentConfirmed && (
+          <motion.div
+            initial={{ y: -100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -100, opacity: 0 }}
+            className="fixed top-0 left-0 right-0 bg-yellow-500 text-black p-4 shadow-lg z-[60] flex flex-col sm:flex-row items-center justify-between gap-4"
+          >
+            <div>
+              <p className="font-bold flex items-center gap-2">
+                <Clock className="w-5 h-5" />
+                Você tem um pagamento PIX pendente!
+              </p>
+              <p className="text-sm">Números reservados: {pendingPix.numeros.join(', ')}</p>
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={handleRecoverPix}
+                className="bg-black text-white px-4 py-2 rounded-lg font-bold hover:bg-gray-800 transition-colors flex items-center gap-2"
+              >
+                <QrCode className="w-4 h-4" /> Ver QR Code
+              </button>
+              <button
+                onClick={handleCancelPendingPix}
+                className="bg-transparent border border-black px-4 py-2 rounded-lg font-bold hover:bg-black/10 transition-colors"
+              >
+                Cancelar
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <main className="max-w-6xl mx-auto px-4 mt-8 sm:mt-12 max-lg:mb-14">
         <div className="flex flex-col items-center">
