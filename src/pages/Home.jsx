@@ -12,9 +12,7 @@ const InstagramIcon = ({ className }) => (
   </svg>
 );
 import { Link } from 'react-router-dom';
-import img1 from '../assets/images.jpg';
-import img2 from '../assets/images (1).jpg';
-import img3 from '../assets/images (2).jpg';
+import CarloAcutisSlider from '../components/CarloAcutisSlider';
 
 const copyToClipboard = (text) => {
   navigator.clipboard.writeText(text);
@@ -23,25 +21,10 @@ const copyToClipboard = (text) => {
 export default function Home() {
   // Wake up the API silently
   useEffect(() => {
-    fetchRifa().catch(() => {});
+    fetchRifa().catch(() => { });
   }, []);
 
   const [copied, setCopied] = useState(false);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-
-  const carloImages = [
-    img1,
-    img2,
-    img3,
-  ];
-
-  const nextImage = () => {
-    setCurrentImageIndex((prev) => (prev + 1) % carloImages.length);
-  };
-
-  const prevImage = () => {
-    setCurrentImageIndex((prev) => (prev - 1 + carloImages.length) % carloImages.length);
-  };
 
   const handleCopyPix = () => {
     copyToClipboard('00020126360014br.gov.bcb.pix0114+55779982336765204000053039865802BR5901N6001C62180514Equipevermelha6304C73600020126360014br.gov.bcb.pix0114+55779982336765204000053039865802BR5901N6001C62180514Equipevermelha6304C736'); // Substitua pela chave real
@@ -164,7 +147,7 @@ export default function Home() {
             </a>
             <Link to="/tickets" className="bg-gold hover:bg-yellow-500 text-surface-dark font-bold py-3 sm:py-4 px-6 sm:px-8 rounded-full shadow-[0_0_20px_rgba(212,175,55,0.4)] transition-all flex items-center justify-center gap-2">
               <Ticket className="w-5 h-5" />
-              Comprar Rifa
+              Rifa Solidária
             </Link>
             <a href="#sobre" className="bg-transparent border-2 border-gold text-gold hover:bg-gold hover:text-surface-dark font-bold py-3 sm:py-4 px-6 sm:px-8 rounded-full transition-all flex items-center justify-center gap-2">
               <Flame className="w-5 h-5" />
@@ -209,196 +192,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 3. Padroeiro: São Carlo Acutis */}
-      <section className="py-24 px-6 bg-primary/10 relative overflow-hidden">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <h3 className="text-gold font-bold tracking-widest uppercase mb-2 text-sm">Nosso Padroeiro</h3>
-            <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">São Carlo Acutis</h2>
-            <p className="text-gray-400 max-w-2xl mx-auto text-base md:text-lg">
-              O "Padroeiro da Internet" nos ensina que a santidade é para todos, vestindo jeans e tênis, e usando a tecnologia para evangelizar.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              {
-                title: "A Eucaristia",
-                desc: "Sua 'rodovia para o céu'. Participava da missa diariamente, encontrando em Cristo a força para sua jornada.",
-                icon: <Church className="w-8 h-8" />
-              },
-              {
-                title: "Evangelização Digital",
-                desc: "Usou seu talento com computadores para criar um site catalogando milagres eucarísticos pelo mundo.",
-                icon: <Smartphone className="w-8 h-8" />
-              },
-              {
-                title: "Santidade Cotidiana",
-                desc: "Um jovem comum que amava videogame, brincar com os amigos e ajudar os mais necessitados com sua mesada.",
-                icon: <Flame className="w-8 h-8" />
-              }
-            ].map((pilar, idx) => (
-              <motion.div
-                key={idx}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: idx * 0.2 }}
-                whileHover={{ scale: 1.03 }}
-                className="bg-surface-dark border border-gold/20 p-8 rounded-2xl hover:border-gold hover:shadow-[0_0_15px_rgba(212,175,55,0.3)] transition-colors group relative overflow-hidden flex flex-col"
-              >
-                <div className="absolute top-0 right-0 w-32 h-32 bg-brand-red rounded-bl-full opacity-5 group-hover:opacity-10 transition-opacity"></div>
-                <div className="text-gold mb-6 bg-gold/10 w-16 h-16 rounded-full flex items-center justify-center shrink-0">
-                  {pilar.icon}
-                </div>
-                <h4 className="text-xl font-bold text-white mb-3 relative z-10">{pilar.title}</h4>
-                <p className="text-gray-400 leading-relaxed relative z-10">
-                  {pilar.desc}
-                </p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-
-      {/* 3b. História e Milagre no Brasil */}
-      <section className="py-24 px-6 bg-gradient-to-t from-surface-dark to-primary/10 relative overflow-hidden">
-        <div className="max-w-6xl mx-auto flex flex-col lg:flex-row gap-16 items-center">
-
-          {/* Carousel */}
-          <div className="w-full lg:w-1/2">
-            <div className="relative aspect-[4/5] md:aspect-video lg:aspect-[4/5] rounded-3xl overflow-hidden shadow-[0_0_40px_rgba(212,175,55,0.2)] border border-gold/30 group">
-              <AnimatePresence mode='wait'>
-                <motion.img
-                  key={currentImageIndex}
-                  src={carloImages[currentImageIndex]}
-                  alt={`São Carlo Acutis ${currentImageIndex + 1}`}
-                  initial={{ opacity: 0, x: 50 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -50 }}
-                  transition={{ duration: 0.5 }}
-                  className="w-full h-full object-cover"
-                />
-              </AnimatePresence>
-
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-6">
-                <div className="flex gap-2">
-                  {carloImages.map((_, idx) => (
-                    <div key={idx} className={`w-2 h-2 rounded-full transition-all ${idx === currentImageIndex ? 'bg-gold w-6' : 'bg-white/50'}`} />
-                  ))}
-                </div>
-              </div>
-
-              <button
-                onClick={prevImage}
-                className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-gold text-white hover:text-black p-3 rounded-full backdrop-blur-sm transition-all opacity-0 group-hover:opacity-100"
-              >
-                <ChevronLeft className="w-6 h-6" />
-              </button>
-              <button
-                onClick={nextImage}
-                className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-gold text-white hover:text-black p-3 rounded-full backdrop-blur-sm transition-all opacity-0 group-hover:opacity-100"
-              >
-                <ChevronRight className="w-6 h-6" />
-              </button>
-            </div>
-          </div>
-
-          {/* História e Milagre Text */}
-          <div className="w-full lg:w-1/2">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-            >
-              <h3 className="text-gold font-bold tracking-widest uppercase mb-2 text-sm flex items-center gap-2">
-                <Flame className="w-5 h-5" />
-                História e Milagre
-              </h3>
-              <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">O Jovem de Calça Jeans</h2>
-
-              <div className="space-y-6 text-gray-300 text-base md:text-lg leading-relaxed">
-                <p>
-                  Nascido em Londres em 1991 e criado em Milão, Carlo era um adolescente como qualquer outro de sua geração: gostava de jogar videogame, gravar vídeos e sair com os amigos. Porém, o que o tornava especial era o seu profundo e inabalável amor pela Eucaristia, a qual ele carinhosamente chamava de sua "rodovia para o Céu".
-                </p>
-                <p>
-                  Com um talento impressionante para a informática, Carlo utilizou a internet como uma poderosa ferramenta de evangelização, criando exposições virtuais e catalogando milagres eucarísticos pelo mundo. Ele faleceu em 2006, aos 15 anos, vítima de uma grave leucemia, oferecendo todos os seus sofrimentos por Cristo, pelo Papa e pela Igreja.
-                </p>
-
-                <div className="bg-primary/20 border-l-4 border-brand-red p-6 rounded-r-2xl mt-8 shadow-inner">
-                  <h4 className="text-xl font-bold text-white mb-2 flex items-center gap-2">
-                    <HeartHandshake className="w-6 h-6 text-brand-red" />
-                    O Milagre no Brasil
-                  </h4>
-                  <p className="text-sm md:text-base">
-                    A beatificação de Carlo Acutis ocorreu graças a um lindo milagre no Brasil, na cidade de <strong>Campo Grande (MS)</strong>, no ano de 2013. Um menino chamado Mattheus sofria de uma grave anomalia congênita no pâncreas e não conseguia reter alimentos no estômago, correndo sério risco de vida.
-                    <br /><br />
-                    Durante uma bênção com uma relíquia de Carlo (um pedaço de sua camiseta), Mattheus tocou nela e pediu com fé: <em>"Parar de vomitar"</em>. Imediatamente após a oração, a criança foi completamente curada e voltou a se alimentar normalmente, fato comprovado pela junta médica do Vaticano como inexplicável.
-                  </p>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-
-      {/* 3c. O site dos Milagres Eucarísticos */}
-      <section className="py-24 px-6 bg-gradient-to-b from-surface-dark via-primary/10 to-surface-dark relative overflow-hidden">
-        <div className="absolute -top-24 -left-24 w-72 h-72 bg-gold/10 rounded-full blur-3xl pointer-events-none"></div>
-        <div className="absolute -bottom-32 -right-20 w-80 h-80 bg-brand-red/10 rounded-full blur-3xl pointer-events-none"></div>
-        <div className="max-w-6xl mx-auto relative z-10">
-          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-80px" }} transition={{ duration: 0.8 }} className="grid lg:grid-cols-[0.9fr_1.1fr] gap-10 lg:gap-16 items-center">
-            <div className="bg-surface-dark border border-gold/30 rounded-3xl p-8 md:p-10 shadow-[0_0_35px_rgba(212,175,55,0.12)]">
-              <div className="w-16 h-16 rounded-2xl bg-gold/10 text-gold flex items-center justify-center mb-8"><Globe2 className="w-9 h-9" /></div>
-              <p className="font-cursive text-2xl md:text-3xl text-white leading-relaxed mb-8">“A internet também pode ser uma estrada que conduz as pessoas ao encontro com Jesus.”</p>
-              <div className="grid grid-cols-2 gap-4 border-t border-white/10 pt-8">
-                <div><strong className="block text-3xl md:text-4xl text-gold mb-1">136</strong><span className="text-sm text-gray-400">milagres apresentados</span></div>
-                <div><strong className="block text-3xl md:text-4xl text-gold mb-1">5</strong><span className="text-sm text-gray-400">continentes alcançados</span></div>
-              </div>
-            </div>
-            <div>
-              <h3 className="text-gold font-bold tracking-widest uppercase mb-2 text-sm flex items-center gap-2"><Search className="w-5 h-5" />Fé, pesquisa e tecnologia</h3>
-              <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">O site que Carlo criou para evangelizar</h2>
-              <div className="space-y-5 text-gray-300 text-base md:text-lg leading-relaxed">
-                <p>Carlo Acutis se perguntava por que tantas pessoas faziam longas filas para shows e outros eventos, mas não demonstravam o mesmo entusiasmo para encontrar Jesus na Eucaristia. Para ele, isso acontecia porque muitos ainda não conheciam a grandeza desse sacramento.</p>
-                <p>Movido por esse desejo de despertar a fé, Carlo começou a pesquisar os milagres eucarísticos reconhecidos pela Igreja. Durante cerca de dois anos e meio, com a ajuda de sua família, reuniu fotografias, documentos e relatos históricos e transformou esse conteúdo em uma exposição acessível também pela internet.</p>
-                <p>O propósito era simples e profundo: usar a tecnologia como instrumento de evangelização, mostrar que a presença de Cristo na Eucaristia é uma realidade viva e ajudar outras pessoas a se aproximarem de Deus. O projeto apresenta aproximadamente 136 milagres em 166 painéis e permite visitar virtualmente lugares de diversos países.</p>
-              </div>
-              <a href="https://www.miracolieucaristici.org/pr/Liste/list.html" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 mt-8 bg-gold hover:bg-yellow-500 text-surface-dark font-bold py-4 px-7 rounded-full transition-all hover:scale-105 shadow-[0_0_20px_rgba(212,175,55,0.25)]">
-                Conhecer os Milagres Eucarísticos <ExternalLink className="w-5 h-5" />
-              </a>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-
-      {/* 3d. Quiz Carlo Acutis */}
-      <section className="py-24 px-6 bg-gradient-to-t from-surface-dark to-primary/10 relative overflow-hidden">
-        <div className="max-w-5xl mx-auto relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="bg-gradient-to-br from-[#4a0505] via-brand-red to-black border border-gold/40 rounded-3xl p-8 md:p-12 text-center shadow-[0_0_35px_rgba(179,0,0,0.4)]"
-          >
-            <div className="w-16 h-16 bg-gold text-surface-dark rounded-full flex items-center justify-center mx-auto mb-6">
-              <Sparkles className="w-8 h-8" />
-            </div>
-            <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">Você conhece bem o nosso padroeiro?</h2>
-            <p className="text-gray-300 text-lg mb-8 max-w-2xl mx-auto">
-              Preparamos um mini game divertido de perguntas e respostas sobre a vida de São Carlo Acutis. Mostre o que sabe e alcance a pontuação máxima!
-            </p>
-            <Link to="/quiz" className="inline-flex items-center gap-2 bg-gold hover:bg-yellow-500 text-surface-dark font-bold py-4 px-8 rounded-full shadow-[0_0_20px_rgba(212,175,55,0.4)] transition-all hover:scale-105">
-              Jogar Agora <ExternalLink className="w-5 h-5" />
-            </Link>
-          </motion.div>
-        </div>
-      </section>
+      <CarloAcutisSlider />
 
       {/* 4. Nossa Rifa */}
       <section id="rifa" className="py-24 px-6 bg-gradient-to-b from-primary/10 to-surface-dark relative overflow-hidden">
@@ -425,16 +219,20 @@ export default function Home() {
             </div>
 
             <div className="w-full md:w-1/2 text-center md:text-left relative z-10">
-              <h3 className="text-gold font-bold tracking-widest uppercase mb-2 text-sm">Grande Sorteio</h3>
-              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6">Concorra a uma Air Fryer!</h2>
+              <h3 className="text-gold font-bold tracking-widest uppercase mb-2 text-sm">Rifa Solidária</h3>
+              <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
+                Ajude nossa causa e <span className="text-brand-red drop-shadow-[0_0_10px_rgba(179,0,0,0.8)]">Concorra a uma Air Fryer!</span>
+              </h2>
 
-              <p className="text-gray-300 text-base md:text-lg mb-8 leading-relaxed">
-                Participe da nossa rifa e concorra a uma incrível Air Fryer! Além de ter a chance de ganhar esse super prêmio, você ajuda a Equipe Vermelha na gincana e colabora com nossas ações solidárias. Não fique de fora dessa!
-              </p>
+              <div className="bg-brand-red/10 border-l-4 border-brand-red p-5 rounded-r-xl mb-8">
+                <p className="text-gray-200 text-base md:text-lg leading-relaxed font-medium">
+                  Mais do que um prêmio, seu bilhete é um <strong>ato de amor</strong>. Todo o valor arrecadado será destinado à compra de alimentos e itens de primeira necessidade para pessoas em situação de vulnerabilidade em nossa comunidade.
+                </p>
+              </div>
 
-              <Link to="/tickets" className="inline-flex items-center gap-2 bg-brand-red hover:bg-red-700 text-white font-bold py-4 px-8 rounded-full shadow-[0_0_20px_rgba(179,0,0,0.4)] transition-all hover:scale-105">
-                <Ticket className="w-5 h-5" />
-                Comprar Meu Bilhete
+              <Link to="/tickets" className="w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-brand-red hover:bg-red-700 text-white font-bold text-lg md:text-xl py-5 px-10 rounded-full shadow-[0_15px_40px_rgba(179,0,0,0.6)] transition-all hover:scale-105 hover:-translate-y-1 group">
+                <Ticket className="w-6 h-6 group-hover:rotate-12 transition-transform" />
+                QUERO AJUDAR E CONCORRER
               </Link>
             </div>
           </motion.div>

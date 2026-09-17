@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { fetchRifa, checkoutPix } from '../services/api';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Ticket, X, CheckCircle, Copy, QrCode, DollarSign, ArrowRight, Clock, MessageCircle, Check, Search, ChevronDown, ChevronUp } from 'lucide-react';
+import { Ticket, X, CheckCircle, Copy, QrCode, DollarSign, ArrowRight, Clock, MessageCircle, Check, Search, ChevronDown, ChevronUp, HeartHandshake } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 
 const formatPhone = (value) => {
@@ -307,16 +307,23 @@ export default function Tickets() {
 
       <main className="max-w-6xl mx-auto px-4 mt-8 sm:mt-12 max-lg:mb-14">
         <div className="flex flex-col items-center">
-          <h1 className="font-marker text-5xl md:text-7xl text-brand-red mb-4 text-center">Escolha seus Números</h1>
+          <h1 className="font-marker text-5xl md:text-7xl text-brand-red mb-4 text-center mt-4">Rifa Solidária</h1>
           {rifaData && (
             <div className="mb-6 text-center">
-              <p className="text-xl font-bold text-white mb-1">Prêmio: <span className="text-gold">{'Air Fryer'}</span></p>
-              <p className="text-lg text-gray-300">Valor do Bilhete: <span className="text-green-500 font-bold">{formatCurrency(rifaData.valorCentavos || 500)}</span></p>
+              <p className="text-2xl font-bold text-white mb-2">Prêmio: <span className="text-gold text-3xl">Air Fryer</span></p>
+              <p className="text-lg text-gray-300">Valor do Bilhete: <span className="text-green-500 font-bold text-xl">{formatCurrency(rifaData.valorCentavos || 500)}</span></p>
             </div>
           )}
-          <p className="text-gray-300 text-center max-w-2xl mb-8">
-            Selecione os números que deseja comprar. Ao finalizar, preencha seus dados para gerar o código PIX.
-          </p>
+          
+          <div className="bg-brand-red/10 border border-brand-red/30 rounded-2xl p-6 text-center max-w-3xl mb-8 mx-auto shadow-[0_0_20px_rgba(179,0,0,0.15)]">
+            <h2 className="text-xl md:text-2xl font-bold text-white mb-3 flex items-center justify-center gap-2">
+              <HeartHandshake className="w-6 h-6 text-brand-red" />
+              Seu bilhete alimenta esperança!
+            </h2>
+            <p className="text-gray-300 text-sm md:text-base leading-relaxed">
+              Toda a arrecadação desta rifa será revertida para <strong>ajudar famílias e pessoas em situação de vulnerabilidade</strong> em nossa comunidade. Selecione seus números abaixo e faça parte desta corrente do bem. Ao finalizar, preencha seus dados para gerar o PIX.
+            </p>
+          </div>
 
           <div className="flex gap-4 mb-8 text-sm max-lg:flex-wrap max-lg:justify-center">
             <div className="flex items-center gap-2"><div className="w-4 h-4 bg-green-600 rounded"></div> Livre</div>
