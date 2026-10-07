@@ -44,7 +44,7 @@ export default function DestaquePremio({ rifa }) {
 
   return (
     <section className="bg-black/40 border border-white/10 rounded-3xl overflow-hidden shadow-2xl">
-      <div className="aspect-[4/3] sm:aspect-[16/9] bg-gradient-to-br from-brand-red/40 via-black to-black flex items-center justify-center">
+      <div className="aspect-[4/3] sm:aspect-[16/9] bg-gradient-to-br from-brand-red/40 via-black to-black flex items-center justify-center hidden">
         {fotoFalhou ? (
           <Gift className="w-24 h-24 text-gold" aria-hidden="true" />
         ) : (
@@ -75,7 +75,7 @@ export default function DestaquePremio({ rifa }) {
           </div>
         )}
 
-        <div className="bg-brand-red/10 border border-brand-red/30 rounded-2xl p-4 flex flex-col gap-3">
+        <div className="bg-brand-red/10 border border-brand-red/30 rounded-2xl p-4 flex flex-col gap-3 hidden">
           <p className="flex items-center gap-2 font-bold text-white">
             <span className="relative flex h-3 w-3" aria-hidden="true">
               <span className="motion-safe:animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75" />
