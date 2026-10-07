@@ -155,6 +155,10 @@ export default function Tickets() {
       setErrorMessage('Informe um telefone com DDD.');
       return;
     }
+    if (formData.endereco.trim().length < 5) {
+      setErrorMessage('Informe o endereço completo.');
+      return;
+    }
 
     setIsSubmitting(true);
     setErrorMessage('');
@@ -392,13 +396,22 @@ export default function Tickets() {
                     />
                   </div>
 
+                  <div>
+                    <label className="text-xs text-gold uppercase tracking-wider mb-1 block">Endereço *</label>
+                    <input
+                      type="text" name="endereco" value={formData.endereco} onChange={handleFormChange} required
+                      placeholder="Rua, Número, Bairro, Cidade"
+                      className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-white focus:border-gold outline-none"
+                    />
+                  </div>
+
                   <button
                     type="button"
                     onClick={() => setShowComplementaryFields(!showComplementaryFields)}
                     className="text-gold text-sm flex items-center gap-1 hover:underline self-start font-medium"
                   >
                     {showComplementaryFields ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                    {showComplementaryFields ? 'Ocultar informações opcionais' : 'Adicionar mais informações (opcional)'}
+                    {showComplementaryFields ? 'Ocultar e-mail e CPF' : 'Adicionar e-mail e CPF (opcional)'}
                   </button>
 
                   <AnimatePresence>
@@ -409,14 +422,6 @@ export default function Tickets() {
                         exit={{ height: 0, opacity: 0 }}
                         className="flex flex-col gap-4 overflow-hidden"
                       >
-                        <div>
-                          <label className="text-xs text-gold uppercase tracking-wider mb-1 block">Endereço</label>
-                          <input
-                            type="text" name="endereco" value={formData.endereco} onChange={handleFormChange}
-                            placeholder="Rua, Número, Bairro, Cidade"
-                            className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-white focus:border-gold outline-none"
-                          />
-                        </div>
                         <div>
                           <label className="text-xs text-gold uppercase tracking-wider mb-1 block">E-mail</label>
                           <input
