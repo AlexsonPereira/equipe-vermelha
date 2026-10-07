@@ -27,7 +27,7 @@ export default function Home() {
   const [copied, setCopied] = useState(false);
 
   const handleCopyPix = () => {
-    copyToClipboard('00020126360014br.gov.bcb.pix0114+55779982336765204000053039865802BR5901N6001C62180514Equipevermelha6304C73600020126360014br.gov.bcb.pix0114+55779982336765204000053039865802BR5901N6001C62180514Equipevermelha6304C736'); // Substitua pela chave real
+    copyToClipboard('00020126360014br.gov.bcb.pix0114+55779982336765204000053039865802BR5901N6001C62180514Equipevermelha6304C736');
     setCopied(true);
     setTimeout(() => setCopied(false), 3000);
   };

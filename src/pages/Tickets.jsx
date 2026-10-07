@@ -1,42 +1,66 @@
-import React, { useState, useEffect } from 'react';
-import { fetchRifa, checkoutPix } from '../services/api';
+import React, { useState, useEffect, useCallback } from 'react';
+import { fetchRifa, criarPedido } from '../services/api';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Ticket, X, CheckCircle, Copy, QrCode, DollarSign, ArrowRight, Clock, MessageCircle, Check, Search, ChevronDown, ChevronUp, HeartHandshake } from 'lucide-react';
+import { Ticket, X, QrCode, ArrowRight, Clock, MessageCircle, Search, ChevronDown, ChevronUp, HeartHandshake } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import InstrucoesPagamento from '../components/InstrucoesPagamento';
+import { formatCpf, formatCurrency, formatPhone, telefoneValido } from '../utils/formatters';
 
-const formatPhone = (value) => {
-  const digits = value.replace(/\D/g, '').slice(0, 11);
-  if (digits.length <= 2) return digits ? `(${digits}` : '';
-  const areaCode = digits.slice(0, 2);
-  const number = digits.slice(2);
-  if (number.length <= 4) return `(${areaCode}) ${number}`;
-  const prefixLength = number.length <= 8 ? 4 : 5;
-  return `(${areaCode}) ${number.slice(0, prefixLength)}-${number.slice(prefixLength)}`;
+const STORAGE_KEY = 'pedidoPendente';
+const CHAVE_ANTIGA = 'pendingPix'; // gravada pelo checkout do Mercado Pago
+
+const lerPedidoPendente = () => {
+  try {
+    localStorage.removeItem(CHAVE_ANTIGA);
+    const salvo = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+    return Array.isArray(salvo?.numeros) ? salvo : null;
+  } catch {
+    return null;
+  }
 };
 
-const formatCpf = (value) => {
-  const digits = value.replace(/\D/g, '').slice(0, 11);
-  return digits.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+const salvarPedidoPendente = (pedido) => {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(pedido));
+  } catch {
+    // Sem armazenamento local o aviso apenas não sobrevive ao recarregamento.
+  }
 };
+
+const limparPedidoPendente = () => {
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch {
+    // Idem.
+  }
+};
+
+// O aviso deixa de valer quando a equipe confirmou (PAGO) ou cancelou (LIVRE) todos os números.
+const pedidoResolvido = (pedido, tickets) =>
+  pedido.numeros.every((numero) => {
+    const ticket = tickets.find((t) => t.numero === numero);
+    return !ticket || ticket.status === 'PAGO' || ticket.status === 'LIVRE';
+  });
+
+const MENSAGENS_CARREGANDO = [
+  'Acordando o servidor (pode levar até 50s na primeira vez)...',
+  'Organizando os bilhetes da sorte...',
+  'Quase lá, não desista...',
+  'Ajeitando os últimos detalhes...',
+  'Já está vindo, prometo!'
+];
 
 const LoadingAnimation = () => {
-  const [loadingText, setLoadingText] = useState('Acordando o servidor (pode levar até 50s na primeira vez)...');
-  const messages = [
-    'Acordando o servidor (pode levar até 50s na primeira vez)...',
-    'Organizando os bilhetes da sorte...',
-    'Quase lá, não desista...',
-    'Ajeitando os últimos detalhes...',
-    'Já está vindo, prometo!'
-  ];
+  const [indice, setIndice] = useState(0);
 
   useEffect(() => {
-    let index = 0;
     const interval = setInterval(() => {
-      index = (index + 1) % messages.length;
-      setLoadingText(messages[index]);
+      setIndice((atual) => (atual + 1) % MENSAGENS_CARREGANDO.length);
     }, 10000);
     return () => clearInterval(interval);
   }, []);
+
+  const loadingText = MENSAGENS_CARREGANDO[indice];
 
   return (
     <div className="flex flex-col items-center justify-center py-20 w-full">
@@ -65,104 +89,36 @@ export default function Tickets() {
   const [rifaData, setRifaData] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Multi-select state
   const [selectedTickets, setSelectedTickets] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const [formData, setFormData] = useState({ nome: '', telefone: '', email: '', cpf: '', endereco: '' });
+  const [formData, setFormData] = useState({ nome: '', telefone: '', endereco: '', email: '', cpf: '' });
   const [showComplementaryFields, setShowComplementaryFields] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const [pixData, setPixData] = useState(null);
-  const [copiedPix, setCopiedPix] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const [paymentConfirmed, setPaymentConfirmed] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(300);
-  const [pendingPix, setPendingPix] = useState(null);
 
-  useEffect(() => {
-    loadRifaData();
-    const stored = localStorage.getItem('pendingPix');
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored);
-        if (new Date(parsed.expiraEm) > new Date()) {
-          setPendingPix(parsed);
-        } else {
-          localStorage.removeItem('pendingPix');
-        }
-      } catch (e) {
-        localStorage.removeItem('pendingPix');
-      }
-    }
-  }, []);
+  const [pedido, setPedido] = useState(null);
+  const [pedidoPendente, setPedidoPendente] = useState(lerPedidoPendente);
 
-  useEffect(() => {
-    let timer;
-    if (isModalOpen && pixData && !paymentConfirmed && timeLeft > 0) {
-      timer = setInterval(() => {
-        setTimeLeft(prev => prev - 1);
-      }, 1000);
-    }
-    return () => clearInterval(timer);
-  }, [isModalOpen, pixData, paymentConfirmed, timeLeft]);
-
-  const formatTime = (seconds) => {
-    const m = Math.floor(seconds / 60).toString().padStart(2, '0');
-    const s = (seconds % 60).toString().padStart(2, '0');
-    return `${m}:${s}`;
-  };
-
-  useEffect(() => {
-    let interval;
-    if (isModalOpen && pixData && !paymentConfirmed) {
-      interval = setInterval(async () => {
-        try {
-          const data = await fetchRifa();
-          setRifaData(data);
-
-          const allPaid = selectedTickets.length > 0 && selectedTickets.every(st => {
-            const ticket = data.tickets.find(t => t.numero === st.numero);
-            return ticket?.status === 'PAGO';
-          });
-
-          if (allPaid) {
-            setPaymentConfirmed(true);
-            localStorage.removeItem('pendingPix');
-            setPendingPix(null);
-          }
-        } catch (error) {
-          console.error('Erro no polling:', error);
-        }
-      }, 3000); // Check every 3 seconds
-    }
-    return () => clearInterval(interval);
-  }, [isModalOpen, pixData, paymentConfirmed, selectedTickets]);
-
-  const loadRifaData = async () => {
+  const loadRifaData = useCallback(async () => {
     try {
       const data = await fetchRifa();
       setRifaData(data);
+      const salvo = lerPedidoPendente();
+      if (salvo && pedidoResolvido(salvo, data.tickets)) {
+        limparPedidoPendente();
+        setPedidoPendente(null);
+      }
     } catch (error) {
       console.error(error);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const handleRecoverPix = () => {
-    if (!pendingPix) return;
-    setSelectedTickets(pendingPix.numeros.map(n => ({ numero: n })));
-    setPixData(pendingPix.pixData);
-    const diff = Math.floor((new Date(pendingPix.expiraEm) - new Date()) / 1000);
-    setTimeLeft(diff > 0 ? diff : 0);
-    setIsModalOpen(true);
-  };
-  
-  const handleCancelPendingPix = () => {
-    localStorage.removeItem('pendingPix');
-    setPendingPix(null);
-  };
+  useEffect(() => {
+    loadRifaData();
+  }, [loadRifaData]);
 
   const handleTicketClick = (ticket) => {
     if (ticket.status === 'LIVRE') {
@@ -187,58 +143,73 @@ export default function Tickets() {
     });
   };
 
+  const fecharModal = () => {
+    setIsModalOpen(false);
+    setPedido(null);
+    setErrorMessage('');
+  };
+
   const handleReserva = async (e) => {
     e.preventDefault();
+    if (!telefoneValido(formData.telefone)) {
+      setErrorMessage('Informe um telefone com DDD.');
+      return;
+    }
+
     setIsSubmitting(true);
     setErrorMessage('');
     try {
-      const result = await checkoutPix({
+      const comprador = Object.fromEntries(
+        Object.entries(formData).filter(([, valor]) => valor.trim() !== '')
+      );
+      const resultado = await criarPedido({
         numeros: selectedTickets.map(t => t.numero),
-        comprador: {
-          nome: formData.nome,
-          telefone: formData.telefone,
-          email: formData.email || 'anonimo@rifa.com',
-          cpf: formData.cpf || '123.456.789-09',
-          endereco: formData.endereco,
-        }
+        comprador,
       });
-      setPixData(result.pix);
-      
-      const diff = Math.floor((new Date(result.expiraEm) - new Date()) / 1000);
-      setTimeLeft(diff > 0 ? diff : 300);
-      
-      const pendingData = {
-        pixData: result.pix,
-        expiraEm: result.expiraEm,
-        numeros: selectedTickets.map(t => t.numero),
-        totalCentavos: totalCentavos
-      };
-      localStorage.setItem('pendingPix', JSON.stringify(pendingData));
-      setPendingPix(pendingData);
 
+      const resumo = {
+        codigo: resultado.codigo,
+        numeros: resultado.numeros,
+        valorTotalCentavos: resultado.valorTotalCentavos,
+        pix: resultado.pix,
+        linkWhatsapp: resultado.linkWhatsapp,
+        telefone: formData.telefone,
+      };
+      salvarPedidoPendente(resumo);
+      setPedidoPendente(resumo);
+      setPedido(resumo);
+      setSelectedTickets([]);
       await loadRifaData();
     } catch (error) {
       if (error.status === 409) {
         setErrorMessage(error.message);
         setTimeout(() => {
           setSelectedTickets([]);
-          setIsModalOpen(false);
+          fecharModal();
         }, 2500);
         await loadRifaData();
+      } else if (error.status === 400) {
+        setErrorMessage('Confira os dados informados e tente novamente.');
       } else {
-        setErrorMessage('Erro ao gerar pagamento Pix. Tente novamente.');
+        setErrorMessage('Não foi possível reservar. Tente novamente.');
       }
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleCopyPix = () => {
-    if (pixData?.copiaECola) {
-      navigator.clipboard.writeText(pixData.copiaECola);
-      setCopiedPix(true);
-      setTimeout(() => setCopiedPix(false), 3000);
-    }
+  const abrirPedidoPendente = () => {
+    setPedido(pedidoPendente);
+    setIsModalOpen(true);
+  };
+
+  const dispensarPedidoPendente = () => {
+    limparPedidoPendente();
+    setPedidoPendente(null);
+  };
+
+  const acompanharPedido = (telefone) => {
+    navigate('/meus-bilhetes', { state: { telefone } });
   };
 
   const getStatusColor = (ticket) => {
@@ -251,10 +222,6 @@ export default function Tickets() {
       case 'PAGO': return 'bg-brand-red border-red-400 cursor-not-allowed opacity-80';
       default: return 'bg-gray-600 border-gray-400';
     }
-  };
-
-  const formatCurrency = (cents) => {
-    return (cents / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
   };
 
   const totalCentavos = selectedTickets.length * (rifaData?.valorCentavos || 500);
@@ -271,9 +238,9 @@ export default function Tickets() {
         </Link>
       </header>
 
-      {/* Pending Pix Banner */}
+      {/* Aviso de pedido aguardando pagamento */}
       <AnimatePresence>
-        {pendingPix && !isModalOpen && !paymentConfirmed && (
+        {pedidoPendente && !isModalOpen && (
           <motion.div
             initial={{ y: -100, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
@@ -283,22 +250,24 @@ export default function Tickets() {
             <div>
               <p className="font-bold flex items-center gap-2">
                 <Clock className="w-5 h-5" />
-                Você tem um pagamento PIX pendente!
+                Pedido #{pedidoPendente.codigo} aguardando pagamento
               </p>
-              <p className="text-sm">Números reservados: {pendingPix.numeros.join(', ')}</p>
+              <p className="text-sm">
+                Números reservados: {pedidoPendente.numeros.join(', ')} · {formatCurrency(pedidoPendente.valorTotalCentavos)}
+              </p>
             </div>
             <div className="flex gap-2">
               <button
-                onClick={handleRecoverPix}
+                onClick={abrirPedidoPendente}
                 className="bg-black text-white px-4 py-2 rounded-lg font-bold hover:bg-gray-800 transition-colors flex items-center gap-2"
               >
-                <QrCode className="w-4 h-4" /> Ver QR Code
+                <QrCode className="w-4 h-4" /> Ver instruções
               </button>
               <button
-                onClick={handleCancelPendingPix}
+                onClick={dispensarPedidoPendente}
                 className="bg-transparent border border-black px-4 py-2 rounded-lg font-bold hover:bg-black/10 transition-colors"
               >
-                Cancelar
+                Dispensar
               </button>
             </div>
           </motion.div>
@@ -314,14 +283,14 @@ export default function Tickets() {
               <p className="text-lg text-gray-300">Valor do Bilhete: <span className="text-green-500 font-bold text-xl">{formatCurrency(rifaData.valorCentavos || 500)}</span></p>
             </div>
           )}
-          
+
           <div className="bg-brand-red/10 border border-brand-red/30 rounded-2xl p-6 text-center max-w-3xl mb-8 mx-auto shadow-[0_0_20px_rgba(179,0,0,0.15)]">
             <h2 className="text-xl md:text-2xl font-bold text-white mb-3 flex items-center justify-center gap-2">
               <HeartHandshake className="w-6 h-6 text-brand-red" />
               Seu bilhete alimenta esperança!
             </h2>
             <p className="text-gray-300 text-sm md:text-base leading-relaxed">
-              Toda a arrecadação desta rifa será revertida para <strong>ajudar famílias e pessoas em situação de vulnerabilidade</strong> em nossa comunidade. Selecione seus números abaixo e faça parte desta corrente do bem. Ao finalizar, preencha seus dados para gerar o PIX.
+              Toda a arrecadação desta rifa será revertida para <strong>ajudar famílias e pessoas em situação de vulnerabilidade</strong> em nossa comunidade. Selecione seus números abaixo, preencha seus dados para reservá-los e pague via PIX.
             </p>
           </div>
 
@@ -353,7 +322,7 @@ export default function Tickets() {
         </div>
       </main>
 
-      {/* Floating Checkout Bar */}
+      {/* Barra flutuante de finalização */}
       <AnimatePresence>
         {selectedTickets.length > 0 && !isModalOpen && (
           <motion.div
@@ -381,16 +350,18 @@ export default function Tickets() {
         )}
       </AnimatePresence>
 
-      {/* Reserva Modal */}
+      {/* Modal de reserva */}
       <AnimatePresence>
         {isModalOpen && (
-          <Modal onClose={() => { setIsModalOpen(false); setPixData(null); setErrorMessage(''); setPaymentConfirmed(false); }}>
-            {!pixData ? (
+          <Modal onClose={fecharModal}>
+            {pedido ? (
+              <InstrucoesPagamento pedido={pedido} onAcompanhar={() => acompanharPedido(pedido.telefone)} />
+            ) : (
               <>
                 <h2 className="text-2xl font-bold text-white mb-2">
                   Finalizar Compra
                 </h2>
-                <p className="text-sm text-gray-400 mb-4">Você está comprando {selectedTickets.length} números: <strong className="text-gold">{selectedTickets.map(t => t.numero).join(', ')}</strong></p>
+                <p className="text-sm text-gray-400 mb-4">Você está reservando {selectedTickets.length} {selectedTickets.length === 1 ? 'número' : 'números'}: <strong className="text-gold">{selectedTickets.map(t => t.numero).join(', ')}</strong></p>
 
                 <div className="bg-black/30 p-3 rounded-lg mb-6 border border-white/5 flex justify-between items-center">
                   <span className="text-gray-300">Total a pagar:</span>
@@ -413,18 +384,10 @@ export default function Tickets() {
                   </div>
 
                   <div>
-                    <label className="text-xs text-gold uppercase tracking-wider mb-1 block">Telefone</label>
+                    <label className="text-xs text-gold uppercase tracking-wider mb-1 block">Telefone (WhatsApp) *</label>
                     <input
-                      type="tel" name="telefone" value={formData.telefone} onChange={handleFormChange}
-                      placeholder="(00) 00000-0000"
-                      className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-white focus:border-gold outline-none"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs text-gold uppercase tracking-wider mb-1 block">Endereço</label>
-                    <input
-                      type="text" name="endereco" value={formData.endereco} onChange={handleFormChange}
-                      placeholder="Rua, Número, Bairro, Cidade"
+                      type="tel" name="telefone" value={formData.telefone} onChange={handleFormChange} required
+                      inputMode="tel" placeholder="(00) 00000-0000"
                       className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-white focus:border-gold outline-none"
                     />
                   </div>
@@ -435,7 +398,7 @@ export default function Tickets() {
                     className="text-gold text-sm flex items-center gap-1 hover:underline self-start font-medium"
                   >
                     {showComplementaryFields ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                    {showComplementaryFields ? 'Ocultar campos complementares' : 'Adicionar E-mail e CPF (Opcional)'}
+                    {showComplementaryFields ? 'Ocultar informações opcionais' : 'Adicionar mais informações (opcional)'}
                   </button>
 
                   <AnimatePresence>
@@ -446,6 +409,14 @@ export default function Tickets() {
                         exit={{ height: 0, opacity: 0 }}
                         className="flex flex-col gap-4 overflow-hidden"
                       >
+                        <div>
+                          <label className="text-xs text-gold uppercase tracking-wider mb-1 block">Endereço</label>
+                          <input
+                            type="text" name="endereco" value={formData.endereco} onChange={handleFormChange}
+                            placeholder="Rua, Número, Bairro, Cidade"
+                            className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-white focus:border-gold outline-none"
+                          />
+                        </div>
                         <div>
                           <label className="text-xs text-gold uppercase tracking-wider mb-1 block">E-mail</label>
                           <input
@@ -470,98 +441,14 @@ export default function Tickets() {
                     disabled={isSubmitting}
                     className="mt-2 bg-brand-red text-white font-bold rounded-lg py-4 shadow-[0_0_15px_rgba(179,0,0,0.4)] hover:bg-red-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
                   >
-                    {isSubmitting ? 'Gerando PIX...' : (
+                    {isSubmitting ? 'Reservando...' : (
                       <>
-                        <QrCode className="w-5 h-5" /> Pagar via PIX
+                        <Ticket className="w-5 h-5" /> Reservar números
                       </>
                     )}
                   </button>
                 </form>
               </>
-            ) : paymentConfirmed ? (
-              <div className="flex flex-col items-center text-center py-6">
-                <motion.div
-                  initial={{ scale: 0 }} animate={{ scale: 1 }}
-                  className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-[0_0_30px_rgba(34,197,94,0.5)]"
-                >
-                  <Check className="w-10 h-10 text-white" />
-                </motion.div>
-                <motion.h2
-                  initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-                  className="text-3xl font-bold text-white mb-3"
-                >
-                  Pagamento Confirmado!
-                </motion.h2>
-                <motion.p
-                  initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-                  className="text-gray-300 mb-8"
-                >
-                  Seus bilhetes foram garantidos com sucesso. Boa sorte!
-                </motion.p>
-                <motion.button
-                  initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}
-                  onClick={() => { navigate('/meus-bilhetes', { state: { cpf: formData.cpf } }) }}
-                  className="bg-green-600 hover:bg-green-500 text-white px-8 py-3 rounded-xl font-bold shadow-lg transition-colors w-full"
-                >
-                  Ver meus Comprovantes
-                </motion.button>
-              </div>
-            ) : (
-              <div className="flex flex-col items-center text-center">
-                <motion.h2
-                  initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-                  className="text-2xl font-bold text-white mb-2"
-                >
-                  Pedido Criado!
-                </motion.h2>
-                <motion.p
-                  initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-                  className="text-sm text-gray-400 mb-6"
-                >
-                  Faça o pagamento via PIX para garantir seus números. A baixa será feita automaticamente.
-                  {timeLeft > 0 ? (
-                    <span className="block mt-2 text-yellow-500 font-bold">Atenção: Você tem {formatTime(timeLeft)} para efetuar o pagamento.</span>
-                  ) : (
-                    <span className="block mt-2 text-red-500 font-bold">O tempo expirou. Se já pagou, aguarde a baixa ou fale conosco.</span>
-                  )}
-                </motion.p>
-
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2 }}
-                  className="relative mb-6"
-                >
-                  <div className="bg-white p-3 rounded-xl w-48 h-48 mx-auto flex items-center justify-center overflow-hidden shadow-lg">
-                    <img src={`data:image/png;base64,${pixData.qrCodeBase64}`} alt="QR Code PIX" className="w-full h-full object-contain" />
-                  </div>
-                </motion.div>
-
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
-                  className="w-full mb-5 relative"
-                >
-                  <span className="text-[10px] text-gold uppercase tracking-wider font-medium mb-1.5 block text-left">Chave PIX Copia e Cola</span>
-                  <button
-                    onClick={handleCopyPix}
-                    className={`w-full border py-3 px-4 rounded-xl flex items-center justify-between transition-all duration-300 ${copiedPix
-                      ? 'bg-green-500/10 border-green-500/50 shadow-[0_0_15px_rgba(34,197,94,0.15)]'
-                      : 'bg-black/50 border-gold/30 hover:bg-gold/10 hover:border-gold'
-                      }`}
-                  >
-                    <span className="truncate mr-4 text-xs text-gray-300 font-mono">{pixData.copiaECola.substring(0, 20)}...</span>
-                    <div className={`flex items-center gap-1.5 text-xs font-medium flex-shrink-0 ${copiedPix ? 'text-green-500' : 'text-gold'}`}>
-                      {copiedPix ? <><CheckCircle className="w-4 h-4" /> Copiado</> : <><Copy className="w-4 h-4" /> Copiar</>}
-                    </div>
-                  </button>
-                </motion.div>
-
-                <motion.button
-                  initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}
-                  onClick={() => { setIsModalOpen(false); setSelectedTickets([]); setPixData(null); setPaymentConfirmed(false); }}
-                  className="text-gray-400 hover:text-white text-sm"
-                >
-                  Fechar e aguardar confirmação
-                </motion.button>
-              </div>
             )}
           </Modal>
         )}

@@ -1,6 +1,31 @@
 const API_URL = 'https://backend-rifa-ijgv.onrender.com/api';
 // const API_URL = 'http://localhost:3000/api';
 
+const erroComStatus = async (response, mensagemPadrao) => {
+  const errorData = await response.json().catch(() => ({}));
+  const error = new Error(errorData.error || mensagemPadrao);
+  error.status = response.status;
+  return error;
+};
+
+const erroAdmin = async (response, mensagemPadrao) => {
+  if (response.status === 401 || response.status === 403) {
+    const error = new Error('Sessão expirada. Faça login novamente.');
+    error.status = response.status;
+    return error;
+  }
+  return erroComStatus(response, mensagemPadrao);
+};
+
+const postAdmin = async (path, token, mensagemPadrao) => {
+  const response = await fetch(`${API_URL}${path}`, {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${token}` },
+  });
+  if (!response.ok) throw await erroAdmin(response, mensagemPadrao);
+  return await response.json();
+};
+
 export const fetchRifa = async () => {
   const response = await fetch(`${API_URL}/rifa`);
   if (!response.ok) {
@@ -19,24 +44,16 @@ export const fetchComprovante = async (codigo) => {
   return await response.json();
 };
 
-export const checkoutPix = async (dadosDaReserva) => {
-  const response = await fetch(`${API_URL}/pedidos/checkout-pix`, {
+export const criarPedido = async (dados) => {
+  const response = await fetch(`${API_URL}/pedidos`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(dadosDaReserva),
+    body: JSON.stringify(dados),
   });
 
-  if (!response.ok) {
-    if (response.status === 409) {
-      const errorData = await response.json().catch(() => ({}));
-      const error = new Error(errorData.error || 'Um ou mais números já foram reservados.');
-      error.status = 409;
-      throw error;
-    }
-    throw new Error('Erro ao processar o pagamento Pix');
-  }
+  if (!response.ok) throw await erroComStatus(response, 'Não foi possível reservar. Tente novamente.');
 
   return await response.json();
 };
@@ -58,52 +75,30 @@ export const adminLogin = async (senha) => {
   return data.token;
 };
 
-export const fetchAdminTickets = async (token) => {
-  const response = await fetch(`${API_URL}/admin/numeros`, {
+export const fetchAdminPedidos = async (token) => {
+  const response = await fetch(`${API_URL}/admin/pedidos`, {
     headers: {
       'Authorization': `Bearer ${token}`
     }
   });
 
-  if (!response.ok) {
-    if (response.status === 401 || response.status === 403) {
-      const error = new Error('Sessão expirada. Faça login novamente.');
-      error.status = response.status;
-      throw error;
-    }
-    throw new Error('Erro ao buscar tickets como admin');
-  }
-
-  const data = await response.json();
-  return Array.isArray(data) ? data : (data.tickets || []);
-};
-
-export const updateTicketStatus = async (numero, status, token) => {
-  const response = await fetch(`${API_URL}/admin/numeros/${numero}/status`, {
-    method: 'PATCH',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    },
-    body: JSON.stringify({ status }),
-  });
-
-  if (!response.ok) {
-    if (response.status === 401 || response.status === 403) {
-      const error = new Error('Sessão expirada. Faça login novamente.');
-      error.status = response.status;
-      throw error;
-    }
-    throw new Error('Erro ao atualizar status');
-  }
+  if (!response.ok) throw await erroAdmin(response, 'Erro ao buscar pedidos');
 
   return await response.json();
 };
 
-export const fetchMeusBilhetes = async (cpf) => {
-  const response = await fetch(`${API_URL}/rifa/meus-bilhetes/${cpf}`);
-  if (!response.ok) {
-    throw new Error('Erro ao buscar bilhetes');
-  }
+export const confirmarPedido = (id, token) =>
+  postAdmin(`/admin/pedidos/${id}/confirmar`, token, 'Erro ao confirmar pedido');
+
+export const cancelarPedido = (id, token) =>
+  postAdmin(`/admin/pedidos/${id}/cancelar`, token, 'Erro ao cancelar pedido');
+
+export const liberarTicketLegado = (numero, token) =>
+  postAdmin(`/admin/numeros/${numero}/liberar`, token, 'Erro ao liberar número');
+
+export const fetchMeusBilhetes = async (telefone) => {
+  const digitos = String(telefone).replace(/\D/g, '');
+  const response = await fetch(`${API_URL}/rifa/meus-bilhetes/${digitos}`);
+  if (!response.ok) throw await erroComStatus(response, 'Erro ao buscar bilhetes');
   return await response.json();
 };

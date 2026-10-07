@@ -1,27 +1,17 @@
 import { jsPDF } from 'jspdf';
+import { formatPhone } from '../utils/formatters';
 
-/**
- * Gera um PDF de comprovante de pagamento da rifa.
- * @param {object} ticket - Os dados do ticket com status PAGO.
- * @returns {File} Um objeto File representando o PDF gerado.
- */
-export const generatePDF = (ticket) => {
-  const doc = new jsPDF({
-    orientation: 'portrait',
-    unit: 'mm',
-    format: 'a5', // Formato menor, ideal para comprovante
-  });
+// ---- Cores ----
+const darkBg = [18, 18, 18];
+const gold = [212, 175, 55];
+const white = [255, 255, 255];
+const gray = [160, 160, 160];
+const green = [34, 197, 94];
 
+const desenharPagina = (doc, ticket, codigoPedido) => {
   const pageWidth = doc.internal.pageSize.getWidth();
   const margin = 15;
   let y = margin;
-
-  // ---- Cores ----
-  const darkBg = [18, 18, 18];
-  const gold = [212, 175, 55];
-  const white = [255, 255, 255];
-  const gray = [160, 160, 160];
-  const green = [34, 197, 94];
 
   // ---- Fundo escuro ----
   doc.setFillColor(...darkBg);
@@ -73,9 +63,10 @@ export const generatePDF = (ticket) => {
     y += 9;
   };
 
+  addField('PEDIDO', `#${codigoPedido}`);
   addField('NÚMERO DO BILHETE', `#${ticket.numero}`);
   addField('COMPRADOR', ticket.comprador_nome || 'N/A');
-  addField('TELEFONE', ticket.comprador_telefone || 'N/A');
+  addField('TELEFONE', formatPhone(ticket.comprador_telefone || '') || 'N/A');
 
   const valorFormatado = ticket.valor_pago_centavos
     ? (ticket.valor_pago_centavos / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
@@ -114,9 +105,26 @@ export const generatePDF = (ticket) => {
   doc.setDrawColor(...gold);
   doc.setLineWidth(1);
   doc.line(margin, y, pageWidth - margin, y);
+};
 
-  // Retorna como File para uso com navigator.share
+/**
+ * Gera um único PDF com uma página de comprovante por número do pedido.
+ * @param {object} pedido - Pedido pago, no formato de GET /api/admin/pedidos.
+ * @returns {File} PDF pronto para navigator.share ou download.
+ */
+export const generatePedidoPDF = (pedido) => {
+  const doc = new jsPDF({
+    orientation: 'portrait',
+    unit: 'mm',
+    format: 'a5', // Formato menor, ideal para comprovante
+  });
+
+  pedido.tickets.forEach((ticket, indice) => {
+    if (indice > 0) doc.addPage('a5', 'portrait');
+    desenharPagina(doc, ticket, pedido.codigo);
+  });
+
   const pdfBlob = doc.output('blob');
-  const fileName = `comprovante_rifa_${ticket.numero}.pdf`;
+  const fileName = `comprovante_pedido_${pedido.codigo}.pdf`;
   return new File([pdfBlob], fileName, { type: 'application/pdf' });
 };

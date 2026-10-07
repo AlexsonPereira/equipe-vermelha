@@ -1,36 +1,80 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Search, Ticket, CheckCircle } from 'lucide-react';
+import { ArrowLeft, CheckCircle, Clock, MessageCircle, Search, Ticket } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { fetchMeusBilhetes } from '../services/api';
+import { formatCurrency, formatDateTime, formatPhone, telefoneValido } from '../utils/formatters';
 
-const formatCpf = (value) => {
-  const digits = value.replace(/\D/g, '').slice(0, 11);
-  return digits.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
-};
+function CartaoPedido({ pedido }) {
+  const pago = pedido.status === 'pago';
+
+  return (
+    <div className="bg-black/40 border border-white/5 rounded-xl p-5">
+      <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
+        <div className="text-left">
+          <p className="text-lg font-bold text-white">Pedido #{pedido.codigo}</p>
+          <p className="text-xs text-gray-400">
+            {pedido.primeiroNome} · {formatDateTime(pedido.criadoEm)} · {formatCurrency(pedido.valorTotalCentavos)}
+          </p>
+        </div>
+        {pago ? (
+          <span className="bg-green-600/20 text-green-500 px-3 py-1 text-xs font-bold rounded-full flex items-center gap-1 border border-green-500/20">
+            <CheckCircle className="w-3 h-3" /> PAGO
+          </span>
+        ) : (
+          <span className="bg-yellow-600/20 text-yellow-500 px-3 py-1 text-xs font-bold rounded-full flex items-center gap-1 border border-yellow-600/30">
+            <Clock className="w-3 h-3" /> Aguardando confirmação do pagamento
+          </span>
+        )}
+      </div>
+
+      {pago ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {pedido.tickets.map((ticket) => (
+            <div key={ticket.numero} className="bg-black/50 border border-white/5 rounded-xl p-4 flex items-center justify-between gap-3">
+              <span className="text-2xl font-bold text-white">#{ticket.numero}</span>
+              {ticket.comprovanteCodigo && (
+                <Link
+                  to={`/comprovante/${ticket.comprovanteCodigo}`}
+                  className="py-2 px-3 bg-white/5 hover:bg-white/10 text-gold rounded-lg text-sm font-bold transition-colors"
+                >
+                  Ver comprovante
+                </Link>
+              )}
+            </div>
+          ))}
+        </div>
+      ) : (
+        <>
+          <p className="text-sm text-gray-300 mb-4 text-left">
+            Números reservados: <strong className="text-white">{pedido.tickets.map((t) => t.numero).join(', ')}</strong>
+          </p>
+          {pedido.linkWhatsapp && (
+            <a
+              href={pedido.linkWhatsapp}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full bg-green-600 hover:bg-green-500 text-white font-bold rounded-xl py-3 flex items-center justify-center gap-2 transition-colors"
+            >
+              <MessageCircle className="w-5 h-5" /> Enviar comprovante no WhatsApp
+            </a>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
 
 export default function MeusBilhetes() {
   const location = useLocation();
-  const [cpf, setCpf] = useState('');
+  const [telefone, setTelefone] = useState('');
   const [loading, setLoading] = useState(false);
-  const [tickets, setTickets] = useState(null);
+  const [pedidos, setPedidos] = useState(null);
   const [error, setError] = useState('');
 
-  React.useEffect(() => {
-    if (location.state?.cpf) {
-      const initialCpf = location.state.cpf;
-      setCpf(initialCpf);
-      performSearch(initialCpf);
-    }
-  }, [location.state]);
-
-  const handleCpfChange = (e) => {
-    setCpf(formatCpf(e.target.value));
-  };
-
-  const performSearch = async (searchCpf) => {
-    if (searchCpf.replace(/\D/g, '').length !== 11) {
-      setError('CPF inválido');
+  const performSearch = useCallback(async (valor) => {
+    if (!telefoneValido(valor)) {
+      setError('Informe o telefone com DDD.');
       return;
     }
 
@@ -38,18 +82,26 @@ export default function MeusBilhetes() {
     setError('');
 
     try {
-      const data = await fetchMeusBilhetes(searchCpf);
-      setTickets(data.tickets || []);
-    } catch (err) {
-      setError('Erro ao buscar bilhetes. Verifique o CPF e tente novamente.');
+      const data = await fetchMeusBilhetes(valor);
+      setPedidos(data.pedidos || []);
+    } catch {
+      setError('Erro ao buscar bilhetes. Verifique o telefone e tente novamente.');
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    const inicial = location.state?.telefone;
+    if (inicial) {
+      setTelefone(formatPhone(inicial));
+      performSearch(inicial);
+    }
+  }, [location.state, performSearch]);
 
   const handleSearch = (e) => {
     e.preventDefault();
-    performSearch(cpf);
+    performSearch(telefone);
   };
 
   return (
@@ -70,25 +122,26 @@ export default function MeusBilhetes() {
             <Ticket className="w-8 h-8" />
           </div>
           <h1 className="text-3xl font-bold text-white mb-2">Meus Bilhetes</h1>
-          <p className="text-gray-400">Digite seu CPF para buscar os bilhetes comprados nesta rifa.</p>
+          <p className="text-gray-400">Digite o telefone usado na reserva para ver seus pedidos.</p>
         </div>
 
         <form onSubmit={handleSearch} className="flex flex-col gap-4 mb-8">
           <div>
-            <label className="text-xs text-gold uppercase tracking-wider mb-2 block font-medium">CPF do Comprador</label>
+            <label className="text-xs text-gold uppercase tracking-wider mb-2 block font-medium">Telefone do comprador</label>
             <div className="flex gap-3 max-lg:flex-col">
               <input
-                type="text"
-                value={cpf}
-                onChange={handleCpfChange}
-                placeholder="000.000.000-00"
-                maxLength="14"
+                type="tel"
+                inputMode="tel"
+                value={telefone}
+                onChange={(e) => setTelefone(formatPhone(e.target.value))}
+                placeholder="(00) 00000-0000"
+                maxLength="15"
                 className="flex-1 bg-black/50 border border-white/10 rounded-xl p-4 text-white focus:border-gold outline-none transition-colors text-lg tracking-wider"
               />
               <button
                 type="submit"
-                disabled={loading || !cpf}
-                className="bg-brand-red hover:bg-red-700 disabled:opacity-50 text-white px-6 rounded-xl font-bold transition-all shadow-[0_0_15px_rgba(179,0,0,0.3)] flex items-center gap-2 max-lg:h-12"
+                disabled={loading || !telefone}
+                className="bg-brand-red hover:bg-red-700 disabled:opacity-50 text-white px-6 rounded-xl font-bold transition-all shadow-[0_0_15px_rgba(179,0,0,0.3)] flex items-center gap-2 max-lg:h-12 justify-center"
               >
                 {loading ? 'Buscando...' : <><Search className="w-5 h-5" /> Buscar</>}
               </button>
@@ -97,38 +150,18 @@ export default function MeusBilhetes() {
           {error && <p className="text-red-400 text-sm font-medium">{error}</p>}
         </form>
 
-        {tickets !== null && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-8">
-            <h2 className="text-xl font-bold text-white mb-4 border-b border-white/10 pb-4">
-              Resultados Encontrados ({tickets.length})
+        {pedidos !== null && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-8 flex flex-col gap-6">
+            <h2 className="text-xl font-bold text-white border-b border-white/10 pb-4">
+              Pedidos encontrados ({pedidos.length})
             </h2>
 
-            {tickets.length === 0 ? (
+            {pedidos.length === 0 ? (
               <div className="text-center py-10 text-gray-400 bg-black/30 rounded-xl border border-white/5">
-                Nenhum bilhete pago encontrado para este CPF.
+                Nenhum pedido encontrado para este telefone.
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {tickets.map((ticket) => (
-                  <div key={ticket.numero} className="bg-black/50 border border-white/5 rounded-xl p-5 hover:border-gold/30 transition-colors flex flex-col h-full relative overflow-hidden">
-                    <div className="absolute top-0 right-0 bg-green-600/20 text-green-500 px-3 py-1 text-xs font-bold rounded-bl-lg flex items-center gap-1 border-b border-l border-green-500/20">
-                      <CheckCircle className="w-3 h-3" /> PAGO
-                    </div>
-
-                    <div className="text-3xl font-bold text-white mb-1">#{ticket.numero}</div>
-                    <div className="text-sm text-gray-400 mb-4">{ticket.comprador_nome}</div>
-
-                    <div className="mt-auto pt-4 border-t border-white/5">
-                      <Link
-                        to={`/comprovante/${ticket.comprovante_codigo}`}
-                        className="block w-full py-2 text-center bg-white/5 hover:bg-white/10 text-gold rounded-lg text-sm font-bold transition-colors"
-                      >
-                        Ver Comprovante Completo
-                      </Link>
-                    </div>
-                  </div>
-                ))}
-              </div>
+              pedidos.map((pedido) => <CartaoPedido key={`${pedido.codigo}-${pedido.criadoEm}`} pedido={pedido} />)
             )}
           </motion.div>
         )}
