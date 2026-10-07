@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { CheckCircle, Copy, MessageCircle, Search } from 'lucide-react';
+import { CheckCircle, Copy, MessageCircle, Search, Share2 } from 'lucide-react';
 import { formatCurrency } from '../utils/formatters';
+import { formatarPrazo } from '../utils/contagem';
+import BotaoCompartilhar from './rifa/BotaoCompartilhar';
 
 export default function InstrucoesPagamento({ pedido, onAcompanhar }) {
   const [copiado, setCopiado] = useState(false);
@@ -32,6 +34,12 @@ export default function InstrucoesPagamento({ pedido, onAcompanhar }) {
       <div className="w-full bg-green-500/10 border border-green-500/40 rounded-xl p-4 mb-5">
         <p className="text-xs text-green-400 uppercase tracking-wider font-bold mb-1">Pague exatamente</p>
         <p className="text-3xl font-bold text-white">{formatCurrency(pedido.valorTotalCentavos)}</p>
+        {pedido.economiaCentavos > 0 && (
+          <p className="text-xs text-green-300 mt-1">Você economizou {formatCurrency(pedido.economiaCentavos)} com o pacote!</p>
+        )}
+        {pedido.expiraEm && (
+          <p className="text-sm text-yellow-300 font-bold mt-2">⏰ Pague até {formatarPrazo(pedido.expiraEm)}</p>
+        )}
       </div>
 
       <div className="bg-white p-3 rounded-xl w-44 h-44 mx-auto mb-4 shadow-lg">
@@ -70,11 +78,16 @@ export default function InstrucoesPagamento({ pedido, onAcompanhar }) {
         Seus números ficam reservados até a equipe confirmar o pagamento. Você receberá o comprovante pelo WhatsApp.
       </p>
 
-      {onAcompanhar && (
-        <button onClick={onAcompanhar} className="text-gold hover:text-white text-sm font-bold flex items-center gap-2 transition-colors">
-          <Search className="w-4 h-4" /> Acompanhar em Meus Bilhetes
-        </button>
-      )}
+      <div className="w-full flex flex-col gap-2">
+        <BotaoCompartilhar className="w-full min-h-12 rounded-xl border border-gold/40 text-gold font-bold flex items-center justify-center gap-2">
+          <Share2 className="w-4 h-4" /> Indique para um amigo
+        </BotaoCompartilhar>
+        {onAcompanhar && (
+          <button onClick={onAcompanhar} className="min-h-11 text-gold hover:text-white text-sm font-bold flex items-center justify-center gap-2 transition-colors">
+            <Search className="w-4 h-4" /> Acompanhar em Meus Bilhetes
+          </button>
+        )}
+      </div>
     </div>
   );
 }

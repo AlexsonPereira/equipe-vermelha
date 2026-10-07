@@ -19,7 +19,7 @@ export default function FolhaAcao({ aberta, titulo, onFechar, children }) {
             aria-label={titulo}
             initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
             transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-            className="relative w-full sm:max-w-md bg-surface-dark border-t sm:border border-white/10 rounded-t-3xl sm:rounded-2xl px-5 pt-3 pb-[max(1.5rem,env(safe-area-inset-bottom))] shadow-2xl max-h-[90vh] overflow-y-auto"
+            className="relative w-full sm:max-w-md bg-surface-dark border-t sm:border border-white/10 rounded-t-3xl sm:rounded-2xl px-5 pt-3 pb-[max(1.5rem,env(safe-area-inset-bottom))] shadow-2xl max-h-[90dvh] overflow-y-auto"
           >
             <div className="w-10 h-1.5 bg-white/20 rounded-full mx-auto mb-4 sm:hidden" />
             <div className="flex items-start justify-between gap-4 mb-4">
