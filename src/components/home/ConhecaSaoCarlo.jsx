@@ -47,7 +47,8 @@ export default function ConhecaSaoCarlo() {
 
         <motion.article {...aoRolar(0.1)} className="grid md:grid-cols-2 gap-6 items-center bg-black/40 border border-white/10 rounded-3xl overflow-hidden">
           <div className="relative h-72 md:h-full min-h-[18rem]">
-            <img src={fotoCarlo} alt="São Carlo Acutis" loading="lazy" className="absolute inset-0 w-full h-full object-cover" />
+            {/* Foto vertical com o rosto no terço de cima: o recorte parte do alto para não cortar a cabeça. */}
+            <img src={fotoCarlo} alt="São Carlo Acutis" loading="lazy" className="absolute inset-0 w-full h-full object-cover object-[50%_20%]" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent md:bg-gradient-to-r" />
           </div>
           <div className="p-6 md:pr-8 flex flex-col gap-3">
