@@ -102,3 +102,49 @@ export const fetchMeusBilhetes = async (telefone) => {
   if (!response.ok) throw await erroComStatus(response, 'Erro ao buscar bilhetes');
   return await response.json();
 };
+
+// Com o servidor dormindo a criação pode demorar; depois de 30s desiste para o jogador poder tentar de novo.
+const LIMITE_CRIAR_PARTIDA_MS = 30000;
+
+export const criarPartidaQuiz = async (apelido) => {
+  const controle = new AbortController();
+  const timer = setTimeout(() => controle.abort(), LIMITE_CRIAR_PARTIDA_MS);
+  try {
+    const response = await fetch(`${API_URL}/quiz/partidas`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ apelido }),
+      signal: controle.signal,
+    });
+    if (!response.ok) throw await erroComStatus(response, 'Não foi possível começar a partida.');
+    return await response.json();
+  } finally {
+    clearTimeout(timer);
+  }
+};
+
+export const finalizarPartidaQuiz = async (partidaId, respostas) => {
+  const response = await fetch(`${API_URL}/quiz/partidas/${partidaId}/finalizar`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ respostas }),
+  });
+  if (!response.ok) throw await erroComStatus(response, 'Não foi possível enviar a partida.');
+  return await response.json();
+};
+
+export const fetchRankingQuiz = async () => {
+  const response = await fetch(`${API_URL}/quiz/ranking`);
+  if (!response.ok) throw await erroComStatus(response, 'Erro ao buscar ranking');
+  const data = await response.json();
+  return data.ranking ?? [];
+};
+
+export const ocultarApelidoQuiz = async (apelido, token) => {
+  const response = await fetch(`${API_URL}/admin/quiz/apelidos/${encodeURIComponent(apelido)}`, {
+    method: 'DELETE',
+    headers: { 'Authorization': `Bearer ${token}` },
+  });
+  if (!response.ok) throw await erroAdmin(response, 'Erro ao ocultar apelido');
+  return await response.json();
+};

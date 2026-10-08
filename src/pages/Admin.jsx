@@ -9,6 +9,7 @@ import { formatCurrency, formatPhone } from '../utils/formatters';
 import CartaoPedido from '../components/admin/CartaoPedido';
 import FolhaAcao from '../components/admin/FolhaAcao';
 import ListaLegados from '../components/admin/ListaLegados';
+import RankingQuizAdmin from '../components/admin/RankingQuizAdmin';
 import ResumoRifa from '../components/admin/ResumoRifa';
 
 const AVISOS_COMPARTILHAMENTO = {
@@ -277,6 +278,8 @@ export default function Admin() {
             )}
 
             <ListaLegados tickets={dados.ticketsLegados} onLiberar={(ticket) => setAcao({ tipo: 'legado', ticket })} />
+
+            <RankingQuizAdmin token={adminToken} onSessaoExpirada={handleLogout} onAviso={setAviso} />
           </>
         )}
       </main>

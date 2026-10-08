@@ -3,9 +3,10 @@ import { motion } from 'framer-motion';
 import { Crown, HeartHandshake, Church, Flame, Quote, Ticket } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { fetchRifa } from '../services/api';
-import CarloAcutisSlider from '../components/CarloAcutisSlider';
 import BarraAcoesMobile from '../components/home/BarraAcoesMobile';
 import BarraProgressoLeitura from '../components/home/BarraProgressoLeitura';
+import ConhecaSaoCarlo from '../components/home/ConhecaSaoCarlo';
+import DesafioChamada from '../components/home/DesafioChamada';
 import DoacaoAlimentos from '../components/home/DoacaoAlimentos';
 import FaixaRifa from '../components/home/FaixaRifa';
 import InstagramSobDemanda from '../components/home/InstagramSobDemanda';
@@ -240,7 +241,8 @@ export default function Home() {
       <DoacaoAlimentos />
 
       {/* 5. São Carlo Acutis */}
-      <CarloAcutisSlider />
+      <ConhecaSaoCarlo />
+      <DesafioChamada />
       <LinhaDoTempo />
       <MomentoComCarlo />
 
